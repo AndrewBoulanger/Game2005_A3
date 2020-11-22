@@ -27,7 +27,8 @@ private:
 	Label* m_pInstructionsLabel{};
 
 
-	Button* m_pStartButton;
+	Button* m_pBulletLevelButton;
+	Button* m_pBallLevelButton;
 };
 
 #endif /* defined (__START_SCENE__) */

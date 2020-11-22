@@ -1,6 +1,6 @@
 #pragma once
-#ifndef __PLAY_SCENE__
-#define __PLAY_SCENE__
+#ifndef __BULLET_SCENE__
+#define __BULLET_SCENE__
 
 #include "Scene.h"
 #include "Plane.h"
@@ -9,11 +9,11 @@
 #include "Label.h"
 #include "Box.h"
 
-class PlayScene : public Scene
+class BulletScene : public Scene
 {
 public:
-	PlayScene();
-	~PlayScene();
+	BulletScene();
+	~BulletScene();
 
 	// Scene LifeCycle Functions
 	virtual void draw() override;
@@ -50,4 +50,4 @@ private:
 	void DrawArrow(glm::vec2 Start, glm::vec2 Dir, float Length, glm::vec4 colour);
 };
 
-#endif /* defined (__PLAY_SCENE__) */
+#endif /* defined (__BULLET_SCENE__) */

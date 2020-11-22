@@ -1,4 +1,4 @@
-#include "PlayScene.h"
+#include "BallScene.h"
 #include "Game.h"
 #include "EventManager.h"
 
@@ -10,21 +10,21 @@
 
 #define PPM 30
 
-PlayScene::PlayScene()
+BallScene::BallScene()
 {
-	PlayScene::start();
+	BallScene::start();
 }
 
-PlayScene::~PlayScene()
+BallScene::~BallScene()
 = default;
 
-bool PlayScene::m_viewForce = false;
-bool PlayScene::m_viewVelocity = false;
+bool BallScene::m_viewForce = false;
+bool BallScene::m_viewVelocity = false;
 
-void PlayScene::draw()
+void BallScene::draw()
 {
 	TextureManager::Instance()->draw("background", -300, 0, 1500, 600, 0, 255, false);
-	if(EventManager::Instance().isIMGUIActive())
+	if (EventManager::Instance().isIMGUIActive())
 	{
 		GUI_Function();
 	}
@@ -53,11 +53,11 @@ void PlayScene::draw()
 		DrawArrow(m_pLootbox->getTransform()->position + Offset, m_pLootbox->getRigidBody()->velocity, Util::magnitude(m_pLootbox->getRigidBody()->velocity / 200.0f), Blue);
 	}
 
-	SDL_SetRenderDrawColor(Renderer::Instance()->getRenderer(),0,0,0,0);
-	
+	SDL_SetRenderDrawColor(Renderer::Instance()->getRenderer(), 0, 0, 0, 0);
+
 }
 
-void PlayScene::update()
+void BallScene::update()
 {
 	if (m_pLootbox->getTransform()->position.x >= m_trianglePos.x + m_run)
 	{
@@ -81,12 +81,12 @@ void PlayScene::update()
 
 }
 
-void PlayScene::clean()
+void BallScene::clean()
 {
 	removeAllChildren();
 }
 
-void PlayScene::handleEvents()
+void BallScene::handleEvents()
 {
 	EventManager::Instance().update();
 
@@ -98,15 +98,15 @@ void PlayScene::handleEvents()
 			const auto deadZone = 10000;
 			if (EventManager::Instance().getGameController(0)->LEFT_STICK_X > deadZone)
 			{
-				
+
 			}
 			else if (EventManager::Instance().getGameController(0)->LEFT_STICK_X < -deadZone)
 			{
-			
+
 			}
 			else
 			{
-			
+
 			}
 		}
 	}
@@ -117,18 +117,18 @@ void PlayScene::handleEvents()
 	{
 		if (EventManager::Instance().isKeyDown(SDL_SCANCODE_A))
 		{
-		
+
 		}
 		else if (EventManager::Instance().isKeyDown(SDL_SCANCODE_D))
 		{
-		
+
 		}
 		else
 		{
-		
+
 		}
 	}
-	
+
 
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_ESCAPE))
 	{
@@ -146,12 +146,12 @@ void PlayScene::handleEvents()
 	}
 }
 
-void PlayScene::start()
+void BallScene::start()
 {
 	TextureManager::Instance()->load("../Assets/textures/background.jpg", "background");
 	// Set GUI Title
 	m_guiTitle = "Play Scene";
-	
+
 	// Pixels Per Meter
 	m_PPM = PPM;
 
@@ -167,7 +167,7 @@ void PlayScene::start()
 	m_pLootbox->setPixelsPerMeter(m_PPM);
 	m_pLootbox->setGravity(9.8f);
 	addChild(m_pLootbox);
-	
+
 	m_pLootbox->reset(m_trianglePos.x, m_trianglePos.y - m_rise);
 
 	// Back Button
@@ -223,18 +223,18 @@ void PlayScene::start()
 	m_maxVelocity = 0;
 }
 
-void PlayScene::GUI_Function() const
+void BallScene::GUI_Function() const
 {
-	
+
 	// Always open with a NewFrame
 	ImGui::NewFrame();
 
 	// See examples by uncommenting the following - also look at imgui_demo.cpp in the IMGUI filter
 	//ImGui::ShowDemoWindow();
-	
+
 	ImGui::Begin("Physics simulation", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 
-	if(ImGui::Button((m_pLootbox->IsActive() || m_pLootbox->getTransform()->position.x > m_trianglePos.x ? "Reset Simulation" : "Activate")))
+	if (ImGui::Button((m_pLootbox->IsActive() || m_pLootbox->getTransform()->position.x > m_trianglePos.x ? "Reset Simulation" : "Activate")))
 	{
 		if (m_pLootbox->IsActive() || m_pLootbox->getTransform()->position.x > m_trianglePos.x)
 		{
@@ -266,35 +266,35 @@ void PlayScene::GUI_Function() const
 		m_pLootbox->getRigidBody()->mass = mass;
 
 		m_pLootbox->reset(m_trianglePos.x, m_trianglePos.y - m_rise);
-		
+
 	}
 
 	ImGui::Separator();
 
-	
+
 	if (ImGui::SliderFloat("Height (m)", &height, 0.01f, 15.0f)) {
 		(float)m_rise = height * m_PPM;
 		m_pLootbox->reset(m_trianglePos.x, m_trianglePos.y - m_rise);
 	}
 
 	ImGui::SameLine(350.0F, -1);
-	ImGui::Text("Angle of depression:  %f degrees",  -(glm::degrees(glm::atan(m_rise,m_run))));
-	
+	ImGui::Text("Angle of depression:  %f degrees", -(glm::degrees(glm::atan(m_rise, m_run))));
+
 	if (ImGui::SliderFloat("Length (m)", &length, 0.01f, 20.0f)) {
 		(float)m_run = length * m_PPM;
 		m_pLootbox->reset(m_trianglePos.x, m_trianglePos.y - m_rise);
 	}
 
 	ImGui::SameLine(350.0F, 1);
-	ImGui::Text("Total X displacement:  %fm", (m_pLootbox->getTransform()->position.x - m_trianglePos.x) /m_PPM);
-	
+	ImGui::Text("Total X displacement:  %fm", (m_pLootbox->getTransform()->position.x - m_trianglePos.x) / m_PPM);
+
 	if (ImGui::SliderFloat("Co. of Friction", &CoefficientFriction, 0.0f, 3.0f)) {
 		m_pLootbox->setFriction(CoefficientFriction);
 		m_pLootbox->reset(m_trianglePos.x, m_trianglePos.y - m_rise);
 	}
 
 	ImGui::SameLine(350.0F, -1);
-	ImGui::Text("Distance from slope:   %fm", (m_pLootbox->getTransform()->position.x - m_run - m_trianglePos.x)/m_PPM);
+	ImGui::Text("Distance from slope:   %fm", (m_pLootbox->getTransform()->position.x - m_run - m_trianglePos.x) / m_PPM);
 
 	if (ImGui::SliderFloat("Mass (kg)", &mass, 0.1f, 200.0f)) {
 		m_pLootbox->getRigidBody()->mass = mass;
@@ -303,7 +303,7 @@ void PlayScene::GUI_Function() const
 
 	ImGui::SameLine(350.0F, -1);
 	ImGui::Text("Net Force:              %fN", (Util::magnitude(m_pLootbox->getNetForce() / m_PPM)));
-	
+
 	ImGui::Checkbox("Show Net Force", &m_viewForce);
 
 	ImGui::SameLine(350.0F, -1);
@@ -323,25 +323,25 @@ void PlayScene::GUI_Function() const
 	ImGui::StyleColorsDark();
 }
 
-bool PlayScene::StartSim()
+bool BallScene::StartSim()
 {
-		if (m_pLootbox->IsActive() || m_pLootbox->getTransform()->position.x > m_trianglePos.x)
-		{
-			m_pLootbox->reset(m_trianglePos.x, m_trianglePos.y - m_rise);
-			m_maxVelocity = 0;
-			return true;
-		}
-		else
-		{
-			m_pLootbox->toggleActive();
-			m_pLootbox->setDiretion(glm::normalize(glm::vec2(m_run, m_rise)));
-			m_maxVelocity = (Util::magnitude(glm::vec2(m_run, m_rise) / m_PPM) * Util::magnitude(m_pLootbox->getRigidBody()->acceleration / m_PPM));
-			return false;
-		}
+	if (m_pLootbox->IsActive() || m_pLootbox->getTransform()->position.x > m_trianglePos.x)
+	{
+		m_pLootbox->reset(m_trianglePos.x, m_trianglePos.y - m_rise);
+		m_maxVelocity = 0;
+		return true;
+	}
+	else
+	{
+		m_pLootbox->toggleActive();
+		m_pLootbox->setDiretion(glm::normalize(glm::vec2(m_run, m_rise)));
+		m_maxVelocity = (Util::magnitude(glm::vec2(m_run, m_rise) / m_PPM) * Util::magnitude(m_pLootbox->getRigidBody()->acceleration / m_PPM));
+		return false;
+	}
 }
 
 
-void PlayScene::DrawArrow(glm::vec2 Start, glm::vec2 Dir, float Length, glm::vec4 colour)
+void BallScene::DrawArrow(glm::vec2 Start, glm::vec2 Dir, float Length, glm::vec4 colour)
 {
 	glm::vec2 EndPos = Start + Dir * Length;
 

@@ -42,7 +42,7 @@ void EndScene::handleEvents()
 
 	if (EventManager::Instance().isKeyDown(SDL_SCANCODE_1))
 	{
-		TheGame::Instance()->changeSceneState(PLAY_SCENE);
+		TheGame::Instance()->changeSceneState(BALL_SCENE);
 	}
 }
 
@@ -59,7 +59,7 @@ void EndScene::start()
 	m_pRestartButton->addEventListener(CLICK, [&]()-> void
 	{
 		m_pRestartButton->setActive(false);
-		TheGame::Instance()->changeSceneState(PLAY_SCENE);
+		TheGame::Instance()->changeSceneState(BALL_SCENE);
 	});
 
 	m_pRestartButton->addEventListener(MOUSE_OVER, [&]()->void

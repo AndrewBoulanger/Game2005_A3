@@ -40,7 +40,7 @@ void StartScene::handleEvents()
 
 	if(EventManager::Instance().isKeyDown(SDL_SCANCODE_1))
 	{
-		TheGame::Instance()->changeSceneState(PLAY_SCENE);
+		TheGame::Instance()->changeSceneState(BULLET_SCENE);
 	}
 }
 
@@ -67,25 +67,46 @@ void StartScene::start()
 
 
 	// Start Button
-	m_pStartButton = new Button();
-	m_pStartButton->getTransform()->position = glm::vec2(400.0f, 400.0f); 
+	m_pBulletLevelButton = new Button();
+	m_pBulletLevelButton->getTransform()->position = glm::vec2(250.0f, 400.0f); 
 
-	m_pStartButton->addEventListener(CLICK, [&]()-> void
+	m_pBulletLevelButton->addEventListener(CLICK, [&]()-> void
 	{
-		m_pStartButton->setActive(false);
-		TheGame::Instance()->changeSceneState(PLAY_SCENE);
+		m_pBulletLevelButton->setActive(false);
+		TheGame::Instance()->changeSceneState(BULLET_SCENE);
 	});
 	
-	m_pStartButton->addEventListener(MOUSE_OVER, [&]()->void
+	m_pBulletLevelButton->addEventListener(MOUSE_OVER, [&]()->void
 	{
-		m_pStartButton->setAlpha(128);
+		m_pBulletLevelButton->setAlpha(128);
 	});
 
-	m_pStartButton->addEventListener(MOUSE_OUT, [&]()->void
+	m_pBulletLevelButton->addEventListener(MOUSE_OUT, [&]()->void
 	{
-		m_pStartButton->setAlpha(255);
+		m_pBulletLevelButton->setAlpha(255);
 	});
-	addChild(m_pStartButton);
+	addChild(m_pBulletLevelButton);
+
+	// Start Button
+	m_pBallLevelButton = new Button();
+	m_pBallLevelButton->getTransform()->position = glm::vec2(500.0f, 400.0f);
+
+	m_pBallLevelButton->addEventListener(CLICK, [&]()-> void
+	{
+		m_pBallLevelButton->setActive(false);
+		TheGame::Instance()->changeSceneState(BALL_SCENE);
+	});
+
+	m_pBallLevelButton->addEventListener(MOUSE_OVER, [&]()->void
+	{
+		m_pBallLevelButton->setAlpha(128);
+	});
+
+	m_pBallLevelButton->addEventListener(MOUSE_OUT, [&]()->void
+	{
+		m_pBallLevelButton->setAlpha(255);
+	});
+	addChild(m_pBallLevelButton);
 
 	
 }
