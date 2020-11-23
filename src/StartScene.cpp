@@ -48,8 +48,8 @@ void StartScene::start()
 {
 	TextureManager::Instance()->load("../Assets/textures/background.jpg", "background");
 
-	const SDL_Color orange = { 255, 75, 0, 255 };
-	m_pStartLabel = new Label("GAME2005 Assignment 2 ", "Consolas", 60, orange, glm::vec2(Config::SCREEN_WIDTH >> 1, 40.0f));
+	const SDL_Color orange = { 255, 155, 0, 255 };
+	m_pStartLabel = new Label("GAME2005 Assignment 3 ", "Consolas", 60, orange, glm::vec2(Config::SCREEN_WIDTH >> 1, 40.0f));
 	m_pStartLabel->setParent(this);
 	addChild(m_pStartLabel);
 
@@ -67,7 +67,7 @@ void StartScene::start()
 
 
 	// Start Button
-	m_pBulletLevelButton = new Button();
+	m_pBulletLevelButton = new Button("../Assets/textures/BulletSceneButton.png", "bulletlevel");
 	m_pBulletLevelButton->getTransform()->position = glm::vec2(250.0f, 400.0f); 
 
 	m_pBulletLevelButton->addEventListener(CLICK, [&]()-> void
@@ -78,7 +78,7 @@ void StartScene::start()
 	
 	m_pBulletLevelButton->addEventListener(MOUSE_OVER, [&]()->void
 	{
-		m_pBulletLevelButton->setAlpha(128);
+		m_pBulletLevelButton->setAlpha((Uint8)128);
 	});
 
 	m_pBulletLevelButton->addEventListener(MOUSE_OUT, [&]()->void
@@ -88,8 +88,9 @@ void StartScene::start()
 	addChild(m_pBulletLevelButton);
 
 	// Start Button
-	m_pBallLevelButton = new Button();
+	m_pBallLevelButton = new Button("../Assets/textures/BallSceneButton.png", "BalllLevel");
 	m_pBallLevelButton->getTransform()->position = glm::vec2(500.0f, 400.0f);
+
 
 	m_pBallLevelButton->addEventListener(CLICK, [&]()-> void
 	{
@@ -100,6 +101,7 @@ void StartScene::start()
 	m_pBallLevelButton->addEventListener(MOUSE_OVER, [&]()->void
 	{
 		m_pBallLevelButton->setAlpha(128);
+		
 	});
 
 	m_pBallLevelButton->addEventListener(MOUSE_OUT, [&]()->void

@@ -21,6 +21,7 @@ m_alpha(255), m_name(std::move(button_name)), m_isCentered(is_centered), m_activ
 	const auto size = TextureManager::Instance()->getTextureSize(m_name);
 	setWidth(size.x);
 	setHeight(size.y);
+	setAlpha(255);
 	getTransform()->position = position;
 	setType(type);
 }
