@@ -5,6 +5,7 @@
 #include "Scene.h"
 #include "Plane.h"
 #include "Player.h"
+#include "Ship.h"
 #include "Button.h"
 #include "Label.h"
 #include "Box.h"
@@ -29,13 +30,9 @@ private:
 	
 	glm::vec2 m_mousePosition;
 
-	//slope variables
-	glm::vec2 m_trianglePos;
-	float m_run, m_rise;
-
 	float m_PPM;
-		
-	Box* m_pLootbox;
+
+	Ship* m_pShip;
 
 	// UI Items
 	Button* m_pBackButton;
@@ -46,8 +43,6 @@ private:
 	static bool m_viewForce;
 	static bool m_viewVelocity;
 
-	// Misc Functions
-	void DrawArrow(glm::vec2 Start, glm::vec2 Dir, float Length, glm::vec4 colour);
 };
 
 #endif /* defined (__BULLET_SCENE__) */

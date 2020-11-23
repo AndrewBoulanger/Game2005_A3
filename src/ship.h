@@ -16,37 +16,32 @@ public:
 	void update() override;
 	void clean() override;
 
-	void turnRight();
-	void turnLeft();
-	void moveForward();
-	void moveBack();
-	
+	void moveRight();
+	void moveLeft();
+	void moveUp();
+	void moveDown();
+	void stopMovingX();
+	void stopMovingY();
+
 	void move();
 
 	// getters
-	glm::vec2 getTargetPosition() const;
-	glm::vec2 getCurrentDirection() const;
-	float getMaxSpeed() const;
+	glm::vec2 getDirection() const;
 
 	// setters
-	void setTargetPosition(glm::vec2 newPosition);
-	void setCurrentDirection(glm::vec2 newDirection);
-	void setMaxSpeed(float newSpeed);
+	void setDirection(glm::vec2 newDirection);
 
 private:
 	void m_checkBounds();
 	void m_reset();
 
-	// steering behaviours
-	float m_maxSpeed;
-	float m_turnRate;
 
-	void m_changeDirection();
-	float m_currentHeading;
-	glm::vec2 m_currentDirection;
-	glm::vec2 m_targetPosition;
+	glm::vec2 m_direction;
+	float m_angle;
+	float m_accelerationRate;
+	float m_maxSpeed;
+
 };
 
 
 #endif /* defined (__SHIP__) */
-

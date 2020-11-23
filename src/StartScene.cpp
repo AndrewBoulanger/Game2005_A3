@@ -61,14 +61,14 @@ void StartScene::start()
 	m_pNameLabel2->setParent(this);
 	addChild(m_pNameLabel2);
 
-	m_pInstructionsLabel = new Label("press start button to Play", "Consolas", 40, orange, glm::vec2(Config::SCREEN_WIDTH >> 1, 500.0f));
+	m_pInstructionsLabel = new Label("Select a level to Play", "Consolas", 40, orange, glm::vec2(Config::SCREEN_WIDTH >> 1, 500.0f));
 	m_pInstructionsLabel->setParent(this);
 	addChild(m_pInstructionsLabel);
 
 
 	// Start Button
 	m_pBulletLevelButton = new Button("../Assets/textures/BulletSceneButton.png", "bulletlevel");
-	m_pBulletLevelButton->getTransform()->position = glm::vec2(250.0f, 400.0f); 
+	m_pBulletLevelButton->getTransform()->position = glm::vec2(300.0f, 350.0f); 
 
 	m_pBulletLevelButton->addEventListener(CLICK, [&]()-> void
 	{
@@ -88,8 +88,8 @@ void StartScene::start()
 	addChild(m_pBulletLevelButton);
 
 	// Start Button
-	m_pBallLevelButton = new Button("../Assets/textures/BallSceneButton.png", "BalllLevel");
-	m_pBallLevelButton->getTransform()->position = glm::vec2(500.0f, 400.0f);
+	m_pBallLevelButton = new Button("../Assets/textures/BallSceneButton.png", "BallLevel");
+	m_pBallLevelButton->getTransform()->position = glm::vec2(500.0f, 350.0f);
 
 
 	m_pBallLevelButton->addEventListener(CLICK, [&]()-> void

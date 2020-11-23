@@ -3,6 +3,7 @@
 #include <glm/gtx/norm.hpp>
 #include <SDL.h>
 #include "Renderer.h"
+#include <iostream>
 
 const float Util::EPSILON = glm::epsilon<float>();
 const float Util::Deg2Rad = glm::pi<float>() / 180.0f;
@@ -115,6 +116,7 @@ glm::vec2 Util::limitMagnitude(glm::vec2 vector, const float magnitude)
 		const auto limiter = magnitude / length;
 		vector.x *= limiter;
 		vector.y *= limiter;
+		std::cout << "hit max speed\n";
 		return vector;
 	}
 	else {
