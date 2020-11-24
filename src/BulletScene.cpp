@@ -40,44 +40,48 @@ void BulletScene::update()
 {
 	if (m_sceneActive)
 	{
+		//check if you need to resize
 		if (m_changeInAsteroidAmount)
 		{
 			ChangeNumberOfAsteroids();
 		}
 
+		//spawn an inactive bullet when timer runs out
 		m_timer -= 1.0 * DELTATIME;
-
 		if (m_timer <= 0)
 		{
 			m_timer = m_spawnTime;
 			SpawnBullet();
 		}
 
-		int numInctive = 0;
+		int numInactive = 0;
 
-		//check active bullets
+		//check active bullets for collision and inactivity
 		for (int i = 0; i < m_pbulletPool->getNumberOfActive(); i++)
 		{
 			m_pbulletPool->getdeque()->at(i)->m_checkCollision(m_pShip);
 			if (m_pbulletPool->getdeque()->at(i)->IsActive() == false)
 			{
-				numInctive++;  //deactivate bullet will push these off the active side of the deque
-				removeChild(m_pbulletPool->getdeque()->at(i), false);
+				numInactive++;  //track how many bullets are inactive
+				removeChild(m_pbulletPool->getdeque()->at(i), false);  //need to remove dangling pointer
 			}
 		}
 
-		for (int i = 0; i < numInctive; i++)
+		//deactivate the inactive bullets
+		for (int i = 0; i < numInactive; i++)
 			m_pbulletPool->deactivateBullet();
-		m_readyToEndSim = true;
+
+		m_readyToEndSim = true; 
 	}
 	else
+	{  //deactivate all bullets once when the sim ends
 		if (m_readyToEndSim)
 		{
 			DeactivateAllBullets();
 			m_readyToEndSim = false;
 		}
+	}
 	updateDisplayList();
-
 }
 
 void BulletScene::clean()
@@ -167,9 +171,12 @@ void BulletScene::start()
 	// Pixels Per Meter
 	m_PPM = PPM;
 
+	//sim variables
 	m_sceneActive = false;
 	m_spawnTime = 3.0f;
 	m_timer = 0;
+
+
 	// Back Button
 	m_pBackButton = new Button("../Assets/textures/backButton.png", "back", BACK_BUTTON);
 	m_pBackButton->getTransform()->position = glm::vec2(65.0f, 550.0f);
@@ -180,7 +187,6 @@ void BulletScene::start()
 		m_pBackButton->setActive(false);
 		TheGame::Instance()->changeSceneState(START_SCENE);
 	});
-
 	m_pBackButton->addEventListener(MOUSE_OVER, [&]()->void
 	{
 		m_pBackButton->setAlpha(128);
@@ -191,6 +197,7 @@ void BulletScene::start()
 		m_pBackButton->setAlpha(255);
 	});
 	addChild(m_pBackButton);
+
 
 	// Next Button
 	m_pNextButton = new Button("../Assets/textures/startButton.png", "activate", START_BUTTON);
@@ -205,7 +212,6 @@ void BulletScene::start()
 		else
 			StartSim();
 	});
-
 	m_pNextButton->addEventListener(MOUSE_OVER, [&]()->void
 	{
 		m_pNextButton->setAlpha(128);
@@ -215,8 +221,8 @@ void BulletScene::start()
 	{
 		m_pNextButton->setAlpha(255);
 	});
-
 	addChild(m_pNextButton);
+
 
 	/* Instructions Label */
 	m_pInstructionsLabel = new Label("Press the backtick (`) character to toggle Debug View", "Consolas", 16, {255,255,255,255});
@@ -233,7 +239,6 @@ void BulletScene::start()
 
 void BulletScene::GUI_Function() const
 {
-	
 	// Always open with a NewFrame
 	ImGui::NewFrame();
 
@@ -270,8 +275,10 @@ void BulletScene::GUI_Function() const
 			(bool)m_sceneActive = true;
 
 	}
-
 	ImGui::Separator();
+
+
+	//Asteroid sliders
 	if (ImGui::SliderInt("Max Number of Asteroids", &maxNumberofAsteroids, 1, 20)) {
 		(bool)m_changeInAsteroidAmount = true;
 		(bool)m_sceneActive = false;
@@ -285,18 +292,20 @@ void BulletScene::GUI_Function() const
 		(float)m_spawnTime = SpawnRate;
 		(bool)m_sceneActive = false;
 	}
-
 	ImGui::Separator();
 
 
+	//ship Sliders
 	if (ImGui::SliderFloat("Ship Max Speed (m/s)", &ShipMaxSpeed, 1.0f, 600.0f)) {
 		m_pShip->SetMaxSpeed(ShipMaxSpeed);
 	}
 	if (ImGui::SliderFloat("Ship Acceleration Rate (m/s^2)", &ShipAcceleration, 1.0f, 20.0f)) {
 		m_pShip->SetAcceleration(ShipAcceleration);
 	}
-
 	ImGui::Separator();
+
+
+	//display data
 	ImGui::Text("Active Asteroids:  %i", m_pbulletPool->getNumberOfActive());
 	ImGui::Text("Current Ship Speed:  %0.2fm/s", Util::magnitude(m_pShip->getRigidBody()->velocity));
 	ImGui::Text("Ship Position: X: %0.1f,  Y: %0.1f", m_pShip->getTransform()->position.x, Config::SCREEN_HEIGHT - m_pShip->getTransform()->position.y);

@@ -24,6 +24,7 @@ void BulletPool::resize(int newSize)
 	fillPool();
 }
 
+//gets an available bullet, if there is one. Also resets it
 Bullet* BulletPool::getNextInactiveBullet()
 {
 	if (hasAvailableBullets())
@@ -51,11 +52,7 @@ void BulletPool::deactivateBullet()
 //resets bullets and # of active, remember to also remove them as children in the playscene before calling this
 void BulletPool::deactivateAll()  
 {				
-	
-	for (int i = 0; i < m_nextActive; i++)
-	{
-		m_pBullets.at(i)->reset();
-	}
+	//bullets reset on spawn, so all this function needs to do is say that 0 are active
 	m_nextActive = 0;
 }
 
