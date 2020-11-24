@@ -116,7 +116,6 @@ glm::vec2 Util::limitMagnitude(glm::vec2 vector, const float magnitude)
 		const auto limiter = magnitude / length;
 		vector.x *= limiter;
 		vector.y *= limiter;
-		std::cout << "hit max speed\n";
 		return vector;
 	}
 	else {

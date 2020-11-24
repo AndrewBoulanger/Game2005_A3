@@ -129,9 +129,7 @@ void BulletScene::start()
 	// Pixels Per Meter
 	m_PPM = PPM;
 
-	m_pShip = new Ship();
-	addChild(m_pShip);
-
+	m_sceneActive = false;
 	// Back Button
 	m_pBackButton = new Button("../Assets/textures/restartButton.png", "Reset", RESTART_BUTTON);
 	m_pBackButton->getTransform()->position = glm::vec2(300.0f, 500.0f);
@@ -172,15 +170,19 @@ void BulletScene::start()
 	addChild(m_pNextButton);
 
 	/* Instructions Label */
-	m_pInstructionsLabel = new Label("Press the backtick (`) character to toggle Debug View", "Consolas");
+	m_pInstructionsLabel = new Label("Press the backtick (`) character to toggle Debug View", "Consolas", 20, {255,255,255,255});
 	m_pInstructionsLabel->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 550.0f);
 	addChild(m_pInstructionsLabel);
 
-	m_pTempLabel = new Label("X from Bot Ramp: ", "Consolas");
-	m_pTempLabel->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 20.0f);
-	addChild(m_pTempLabel);
+	m_pShip = new Ship();
+	addChild(m_pShip);
 
-	m_maxVelocity = 0;
+	//bullet pool
+	m_pbulletPool = new BulletPool(10);
+	//for (int i = 0; i < m_pbulletPool->getSize(); i++)
+	//{
+	//	addChild(m_pbulletPool->getdeque()->at(i));
+	//}
 }
 
 void BulletScene::GUI_Function() const
@@ -219,6 +221,8 @@ void BulletScene::GUI_Function() const
 
 bool BulletScene::StartSim()
 {
+	m_sceneActive = true;
+
 	return false;
 }
 

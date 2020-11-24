@@ -183,10 +183,13 @@
     <ClCompile Include="..\src\EventManager.cpp" />
     <ClCompile Include="..\src\SpriteSheet.cpp" />
     <ClCompile Include="..\src\StartScene.cpp" />
-    <ClCompile Include="..\src\Box.cpp" />
+    <ClCompile Include="..\src\Bullet.cpp" />
     <ClCompile Include="..\src\TextureManager.cpp" />
     <ClCompile Include="..\src\Util.cpp" />
     <ClCompile Include="..\src\BallScene.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\src\BulletPool.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClCompile>
   </ItemGroup>
@@ -231,13 +234,14 @@
     <ClInclude Include="..\src\SoundManager.h" />
     <ClInclude Include="..\src\SpriteSheet.h" />
     <ClInclude Include="..\src\StartScene.h" />
-    <ClInclude Include="..\src\Box.h" />
+    <ClInclude Include="..\src\Bullet.h" />
     <ClInclude Include="..\src\TextureManager.h" />
     <ClInclude Include="..\src\Transform.h" />
     <ClInclude Include="..\src\Util.h" />
     <ClInclude Include="..\src\BallScene.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
     </ClInclude>
+    <ClInclude Include="..\src\BulletPool.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md" />

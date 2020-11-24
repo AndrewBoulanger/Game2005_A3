@@ -7,7 +7,6 @@
 #include "Player.h"
 #include "Button.h"
 #include "Label.h"
-#include "Box.h"
 
 class BallScene : public Scene
 {
@@ -35,7 +34,6 @@ private:
 
 	float m_PPM;
 
-	Box* m_pLootbox;
 
 	// UI Items
 	Button* m_pBackButton;

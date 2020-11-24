@@ -117,14 +117,17 @@
     <ClCompile Include="..\include\IMGUI\imgui_widgets.cpp">
       <Filter>IMGUI</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Box.cpp">
-      <Filter>Game Objects</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\BallScene.cpp">
       <Filter>Scenes</Filter>
     </ClCompile>
     <ClCompile Include="..\src\BulletScene.cpp">
       <Filter>Scenes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Bullet.cpp">
+      <Filter>Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BulletPool.cpp">
+      <Filter>Game Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -254,14 +257,17 @@
     <ClInclude Include="..\include\IMGUI\imstb_truetype.h">
       <Filter>IMGUI</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Box.h">
-      <Filter>Game Objects</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\BallScene.h">
       <Filter>Scenes</Filter>
     </ClInclude>
     <ClInclude Include="..\src\BulletScene.h">
       <Filter>Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Bullet.h">
+      <Filter>Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\BulletPool.h">
+      <Filter>Game Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -8,7 +8,9 @@
 #include "Ship.h"
 #include "Button.h"
 #include "Label.h"
-#include "Box.h"
+#include "Bullet.h"
+#include "BulletPool.h"
+#include <deque>
 
 class BulletScene : public Scene
 {
@@ -33,6 +35,12 @@ private:
 	float m_PPM;
 
 	Ship* m_pShip;
+
+	BulletPool* m_pbulletPool;
+
+	bool m_sceneActive;
+
+	float spawnTime, timer;
 
 	// UI Items
 	Button* m_pBackButton;

@@ -1,15 +1,15 @@
 #pragma once
-#ifndef __BOX__
-#define __BOX__
+#ifndef __BULLET__
+#define __BULLET__
 
 #include "DisplayObject.h"
 
 // #define METERS_PER_PIXEL 1.0f/100.0f
 
-class Box final : public DisplayObject {
+class Bullet final : public DisplayObject {
 public:
-	Box();
-	~Box();
+	Bullet();
+	~Bullet();
 
 	// Inherited via GameObject
 	virtual void draw() override;
@@ -27,20 +27,18 @@ public:
 
 	void reset(float x, float y);
 
-	glm::vec2 getDirection();
-	float getFriction();
+
 	float getGravity();
 	bool IsActive();
 
 	void setPixelsPerMeter(float PPM);
-	void setDiretion(glm::vec2 dir);
+
 	void setFriction(float val);
 	void setGravity(float val);
 	void toggleActive();
 	void setActive(bool flag);
 	glm::vec2 getNetForce();
 
-	float GetMaxVelocity();
 
 private:
 	void m_move();
@@ -57,4 +55,4 @@ private:
 };
 
 
-#endif /* defined (__BOX__) */
+#endif /* defined (__BULLET__) */
