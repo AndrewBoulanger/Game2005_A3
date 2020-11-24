@@ -57,6 +57,7 @@ private:
 	static bool m_viewVelocity;
 	bool m_changeInAsteroidAmount;
 	int m_maxNumberOfAsteroids;
+	bool m_readyToEndSim;
 };
 
 #endif /* defined (__BULLET_SCENE__) */

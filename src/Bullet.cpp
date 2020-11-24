@@ -16,7 +16,7 @@ Bullet::Bullet()
 	getRigidBody()->velocity = glm::vec2(0, 0);
 	getRigidBody()->isColliding = false;
 	getRigidBody()->mass = 12.8;
-	m_gravity = 9.8f ;
+	m_gravity = Game::Instance()->getGravity() ;
 
 	m_active = false;
 
@@ -104,6 +104,8 @@ void Bullet::reset()
 	m_active = false;
 	getRigidBody()->acceleration = { 0.0F,0.0F };
 	getRigidBody()->velocity = { 0.0F,0.0F };
+
+	m_gravity = Game::Instance()->getGravity();
 }
 
 

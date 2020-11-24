@@ -28,6 +28,7 @@ Bullet* BulletPool::getNextInactiveBullet()
 {
 	if (hasAvailableBullets())
 	{
+		m_pBullets.at(m_nextActive)->reset();
 		return m_pBullets.at(m_nextActive++);
 	}
 	else
