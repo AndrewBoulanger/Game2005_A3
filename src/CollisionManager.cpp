@@ -13,11 +13,11 @@ int CollisionManager::squaredDistance(const glm::vec2 p1, const glm::vec2 p2)
 	return result;
 }
 
-bool CollisionManager::squaredRadiusCheck(GameObject* object1, GameObject* object2)
+bool CollisionManager::squaredRadiusCheck(GameObject* object1, GameObject* object2, float radiusScalar1, float radiusScalar2)
 {
 	glm::vec2 P1 = object1->getTransform()->position;
 	glm::vec2 P2 = object2->getTransform()->position;
-	const int halfHeights = (object1->getHeight() + object2->getHeight()) * 0.5f;
+	const int halfHeights = (object1->getHeight() *radiusScalar1 + object2->getHeight() *radiusScalar2) * 0.5f;
 
 	//if (glm::distance(P1, P2) < halfHeights) {
 
@@ -29,7 +29,7 @@ bool CollisionManager::squaredRadiusCheck(GameObject* object1, GameObject* objec
 			switch (object2->getType()) {
 			case TARGET:
 				std::cout << "Collision with Target!" << std::endl;
-				SoundManager::Instance().playSound("yay", 0);
+				//SoundManager::Instance().playSound("yay", 0);
 
 				
 				break;
@@ -226,6 +226,7 @@ bool CollisionManager::circleAABBCheck(GameObject* object1, GameObject* object2)
 	int halfBoxHeight = boxHeight * 0.5f;
 
 	const auto boxStart = object2->getTransform()->position - glm::vec2(boxWidth * 0.5f, boxHeight * 0.5f);
+	
 
 	if (circleAABBsquaredDistance(circleCentre, circleRadius, boxStart, boxWidth, boxHeight) <= (circleRadius * circleRadius))
 	{
@@ -242,40 +243,40 @@ bool CollisionManager::circleAABBCheck(GameObject* object1, GameObject* object2)
 			switch (object2->getType()) {
 			case TARGET:
 				std::cout << "Collision with Planet!" << std::endl;
-				SoundManager::Instance().playSound("yay", 0);
+				//SoundManager::Instance().playSound("yay", 0);
 				break;
 			case SHIP:
 				{
-					SoundManager::Instance().playSound("thunder", 0);
-					auto velocityX = object1->getRigidBody()->velocity.x;
-					auto velocityY = object1->getRigidBody()->velocity.y;
+					//SoundManager::Instance().playSound("collision", 0);
+					//auto velocityX = object1->getRigidBody()->velocity.x;
+					//auto velocityY = object1->getRigidBody()->velocity.y;
 
-					if ((attackVector.x > 0 && attackVector.y < 0) || (attackVector.x < 0 && attackVector.y < 0))
-						// top right or top left
-					{
-						
-						if (angle <= 45)
-						{
-							object1->getRigidBody()->velocity = glm::vec2(velocityX, -velocityY);
-						}
-						else
-						{
-							object1->getRigidBody()->velocity = glm::vec2(-velocityX, velocityY);
-						}
-					}
+					//if ((attackVector.x > 0 && attackVector.y < 0) || (attackVector.x < 0 && attackVector.y < 0))
+					//	// top right or top left
+					//{
+					//	
+					//	if (angle <= 45)
+					//	{
+					//		object1->getRigidBody()->velocity = glm::vec2(velocityX, -velocityY);
+					//	}
+					//	else
+					//	{
+					//		object1->getRigidBody()->velocity = glm::vec2(-velocityX, velocityY);
+					//	}
+					//}
 
-					if ((attackVector.x > 0 && attackVector.y > 0) || (attackVector.x < 0 && attackVector.y > 0))
-						// bottom right or bottom left
-					{
-						if (angle <= 135)
-						{
-							object1->getRigidBody()->velocity = glm::vec2(-velocityX, velocityY);
-													}
-						else
-						{
-							object1->getRigidBody()->velocity = glm::vec2(velocityX, -velocityY);
-													}
-					}
+					//if ((attackVector.x > 0 && attackVector.y > 0) || (attackVector.x < 0 && attackVector.y > 0))
+					//	// bottom right or bottom left
+					//{
+					//	if (angle <= 135)
+					//	{
+					//		object1->getRigidBody()->velocity = glm::vec2(-velocityX, velocityY);
+					//								}
+					//	else
+					//	{
+					//		object1->getRigidBody()->velocity = glm::vec2(velocityX, -velocityY);
+					//								}
+					//}
 				}
 				
 

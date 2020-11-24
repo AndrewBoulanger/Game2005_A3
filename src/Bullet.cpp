@@ -3,12 +3,14 @@
 #include "Game.h"
 #include "Util.h"
 
+
 #define DELTA_TIME 1.0f / 60.0f
 Bullet::Bullet()
 {
 	TextureManager::Instance()->load("../Assets/textures/Asteroid.png","Asteroid");
+	SoundManager::Instance().load("../Assets/audio/thunder.ogg", "collision", SOUND_SFX);
 	setWidth(50);
-	setHeight(50);
+	setHeight(45);
 
 	getTransform()->position = glm::vec2(rand()%(Config::SCREEN_WIDTH - getWidth()), -getHeight());
 	getRigidBody()->velocity = glm::vec2(0, 0);
@@ -37,6 +39,7 @@ void Bullet::draw()
 
 	// draw the target
 	TextureManager::Instance()->draw("Asteroid", x, y, getWidth(), getHeight(), m_angle, 255, false);
+
 }
 
 void Bullet::update()
@@ -71,6 +74,20 @@ void Bullet::m_checkBounds()
 		m_active = false;
 		reset();
 	}
+}
+
+void Bullet::m_checkCollision(GameObject* otherObject)
+{
+	if (CollisionManager::squaredRadiusCheck(this, otherObject, 0.85f, 0.85f))
+	{
+		if (m_overlapping == false)
+		{
+			m_overlapping = true;
+			SoundManager::Instance().playSound("collision");
+		}
+	}
+	else 
+		m_overlapping = false;
 }
 
 void Bullet::m_reset()

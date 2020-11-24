@@ -4,6 +4,7 @@
 #include "TextureManager.h"
 #include "Util.h"
 
+
 Ship::Ship()
 {
 	TextureManager::Instance()->load("../Assets/textures/ship3.png", "ship");
@@ -36,7 +37,7 @@ void Ship::draw()
 	const auto y = getTransform()->position.y;
 
 	// draw the ship
-	TextureManager::Instance()->draw("ship", x, y, getWidth(), getHeight(), m_angle, 255, true);
+	TextureManager::Instance()->draw("ship", x, y, getWidth(), getHeight(), m_angle, 255);
 }
 
 
@@ -129,6 +130,16 @@ glm::vec2 Ship::getDirection() const
 void Ship::setDirection(glm::vec2 newDirection)
 {
 	m_direction = newDirection;
+}
+
+void Ship::SetMaxSpeed(float speed)
+{
+	m_maxSpeed = speed;
+}
+
+void Ship::SetAcceleration(float val)
+{
+	m_accelerationRate = val;
 }
 
 

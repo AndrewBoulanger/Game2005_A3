@@ -24,6 +24,7 @@ public:
 	virtual void clean() override;
 	virtual void handleEvents() override;
 	virtual void start() override;
+	
 private:
 	// IMGUI Function
 	void GUI_Function() const;
@@ -44,6 +45,7 @@ private:
 
 	void SpawnBullet();
 	void DeactivateAllBullets();
+	void ChangeNumberOfAsteroids();
 
 	// UI Items
 	Button* m_pBackButton;
@@ -53,7 +55,8 @@ private:
 	float m_maxVelocity;	//used for speed label
 	static bool m_viewForce;
 	static bool m_viewVelocity;
-
+	bool m_changeInAsteroidAmount;
+	int m_maxNumberOfAsteroids;
 };
 
 #endif /* defined (__BULLET_SCENE__) */

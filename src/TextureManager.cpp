@@ -136,8 +136,8 @@ void TextureManager::draw(const std::string& id, const int x, const int y, const
 	destRect.h = h;
 
 	if (centered) {
-		const int xOffset = textureWidth * 0.5;
-		const int yOffset = textureHeight * 0.5;
+		const int xOffset = w * 0.5;
+		const int yOffset = h * 0.5;
 		destRect.x = x - xOffset;
 		destRect.y = y - yOffset;
 	}

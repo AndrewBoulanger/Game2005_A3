@@ -30,6 +30,8 @@ public:
 
 	// setters
 	void setDirection(glm::vec2 newDirection);
+	void SetMaxSpeed(float speed);
+	void SetAcceleration(float val);
 
 private:
 	void m_checkBounds();

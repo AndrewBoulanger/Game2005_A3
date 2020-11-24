@@ -19,6 +19,7 @@ Game::Game() :
 	m_pWindow(nullptr), m_bRunning(true), m_frames(0), m_currentScene(nullptr), m_currentSceneState(NO_SCENE)
 {
 	srand(unsigned(time(nullptr)));  // random seed
+	m_gravity = 9.86f;
 }
 
 Game::~Game()
@@ -172,6 +173,16 @@ void Game::changeSceneState(const SceneState new_state)
 		}
 	}
 	
+}
+
+float Game::getGravity()
+{
+	return m_gravity;
+}
+
+void Game::setGravity(float newGravity)
+{
+	m_gravity = newGravity;
 }
 
 void Game::quit()

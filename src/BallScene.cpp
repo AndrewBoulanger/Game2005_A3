@@ -121,12 +121,14 @@ void BallScene::start()
 
 
 	// Back Button
-	m_pBackButton = new Button("../Assets/textures/restartButton.png", "Reset", RESTART_BUTTON);
-	m_pBackButton->getTransform()->position = glm::vec2(300.0f, 500.0f);
+	m_pBackButton = new Button("../Assets/textures/backButton.png", "back", BACK_BUTTON);
+	m_pBackButton->getTransform()->position = glm::vec2(65.0f, 550.0f);
 	m_pBackButton->addEventListener(CLICK, [&]()-> void
 	{
 		m_pBackButton->setActive(false);
+		TheGame::Instance()->changeSceneState(START_SCENE);
 	});
+
 
 	m_pBackButton->addEventListener(MOUSE_OVER, [&]()->void
 	{

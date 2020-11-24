@@ -40,6 +40,11 @@ void BulletScene::update()
 {
 	if (m_sceneActive)
 	{
+		if (m_changeInAsteroidAmount)
+		{
+			ChangeNumberOfAsteroids();
+		}
+
 		m_timer -= 1.0* DELTATIME;
 		
 		if (m_timer <= 0)
@@ -53,6 +58,7 @@ void BulletScene::update()
 		//check active bullets
 		for (int i = 0; i < m_pbulletPool->getNumberOfActive(); i++)
 		{
+			m_pbulletPool->getdeque()->at(i)->m_checkCollision(m_pShip);
 			if (m_pbulletPool->getdeque()->at(i)->IsActive() == false)
 			{
 				numInctive++;  //deactivate bullet will push these off the active side of the deque
@@ -64,7 +70,6 @@ void BulletScene::update()
 			m_pbulletPool->deactivateBullet();
 
 	}
-
 	updateDisplayList();
 
 }
@@ -160,13 +165,12 @@ void BulletScene::start()
 	m_spawnTime = 3.0f;
 	m_timer = 0;
 	// Back Button
-	m_pBackButton = new Button("../Assets/textures/restartButton.png", "Reset", RESTART_BUTTON);
-	m_pBackButton->getTransform()->position = glm::vec2(300.0f, 500.0f);
+	m_pBackButton = new Button("../Assets/textures/backButton.png", "back", BACK_BUTTON);
+	m_pBackButton->getTransform()->position = glm::vec2(65.0f, 550.0f);
 	m_pBackButton->addEventListener(CLICK, [&]()-> void
 	{
 		m_pBackButton->setActive(false);
-		m_sceneActive = false;
-		DeactivateAllBullets();
+		TheGame::Instance()->changeSceneState(START_SCENE);
 	});
 
 	m_pBackButton->addEventListener(MOUSE_OVER, [&]()->void
@@ -182,7 +186,7 @@ void BulletScene::start()
 
 	// Next Button
 	m_pNextButton = new Button("../Assets/textures/startButton.png", "activate", START_BUTTON);
-	m_pNextButton->getTransform()->position = glm::vec2(500.0f, 500.0f);
+	m_pNextButton->getTransform()->position = glm::vec2(400.0f, 500.0f);
 	m_pNextButton->addEventListener(CLICK, [&]()-> void
 	{
 		if (m_sceneActive)
@@ -216,10 +220,7 @@ void BulletScene::start()
 
 	//bullet pool
 	m_pbulletPool = new BulletPool(10);
-	//for (int i = 0; i < m_pbulletPool->getSize(); i++)
-	//{
-	//	addChild(m_pbulletPool->getdeque()->at(i));
-	//}
+
 }
 
 void BulletScene::GUI_Function() const
@@ -233,20 +234,57 @@ void BulletScene::GUI_Function() const
 	
 	ImGui::Begin("Collision simulation", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 
-	static float CoefficientFriction = 0.42f;
-	static float mass = 12.8f;
+	static float gravity = 9.86f;
+	static int maxNumberofAsteroids = 10;
+	static float SpawnRate = 3.0f;
+	static float ShipMaxSpeed = 300.0f;
+	static float ShipAcceleration = 8.0f;
 
 	if (ImGui::Button("Reset To Default"))
 	{
 		// Reset to Default values
-		CoefficientFriction = 0.42f;
-		mass = 12.8f;
-
+		gravity = 9.86f;
+		//maxNumberofAsteroids = 10; this feels like too heavy an operation to let it be called over an over again
+		SpawnRate = 3.0f;
+		ShipMaxSpeed = 300;
 		
+		(bool)m_sceneActive = false;
+		
+	}
+	if (ImGui::Button("Start"))
+	{
+		if (m_sceneActive)
+		{
+			(bool)m_sceneActive = false;
+			
+		}
+		else
+			(bool)m_sceneActive = true;
+
+	}
+
+	ImGui::Separator();
+	if (ImGui::SliderInt("Max Number of Asteroids", &maxNumberofAsteroids, 1, 20)) {
+		(bool)m_changeInAsteroidAmount = true;
+		(bool)m_sceneActive = false;
+		(int)m_maxNumberOfAsteroids = maxNumberofAsteroids;
+	}
+	if (ImGui::SliderFloat("Gravity (m/s^2)", &gravity, 0.01f, 50.0f)) {
+		Game::Instance()->setGravity(gravity);
+	}
+	if (ImGui::SliderFloat("Asteroid Spawn Rate (s)", &SpawnRate, 0.01f, 10.0f)) {
+		(float)m_spawnTime = SpawnRate;
 	}
 
 	ImGui::Separator();
 
+
+	if (ImGui::SliderFloat("Ship Max Speed (m/s)", &ShipMaxSpeed, 1.0f, 600.0f)) {
+		m_pShip->SetMaxSpeed(ShipMaxSpeed);
+	}
+	if (ImGui::SliderFloat("Ship Acceleration Rate (m/s^2)", &ShipAcceleration, 1.0f, 20.0f)) {
+		m_pShip->SetAcceleration(ShipAcceleration);
+	}
 
 	ImGui::End();
 
@@ -277,9 +315,16 @@ void BulletScene::DeactivateAllBullets()
 {
 	for (int i = 0; i < m_pbulletPool->getNumberOfActive(); i++)
 	{
-		removeChild(m_pbulletPool->getdeque()->at(i));
+		removeChild(m_pbulletPool->getdeque()->at(i), false);
 	}
 	m_pbulletPool->deactivateAll();
+}
+
+void BulletScene::ChangeNumberOfAsteroids()
+{
+	m_changeInAsteroidAmount = false;
+	DeactivateAllBullets();
+	m_pbulletPool->resize(m_maxNumberOfAsteroids);
 }
 
 

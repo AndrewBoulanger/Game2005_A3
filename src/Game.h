@@ -52,6 +52,8 @@ public:
 	Uint32 getFrames() const;
 	bool isRunning() const;
 	void changeSceneState(SceneState new_state);
+	float getGravity();
+	void setGravity(float newGravity);
 	
 private:
 	Game();
@@ -61,6 +63,7 @@ private:
 	bool m_bRunning;
 	Uint32 m_frames;
 	glm::vec2 m_mousePosition;
+	float m_gravity;
 
 	// scene variables
 	Scene* m_currentScene;

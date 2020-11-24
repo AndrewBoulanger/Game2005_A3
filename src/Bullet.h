@@ -39,6 +39,7 @@ public:
 	void setActive(bool flag);
 	glm::vec2 getNetForce();
 
+	void m_checkCollision(GameObject* otherObject);
 
 private:
 	void m_move();
@@ -52,6 +53,7 @@ private:
 	float m_friction, m_gravity, m_PPM;
 
 	bool m_active;
+	bool m_overlapping;
 };
 
 
