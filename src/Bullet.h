@@ -25,7 +25,7 @@ public:
 		m_angle = angle;
 	}
 
-	void reset(float x, float y);
+	void reset();
 
 
 	float getGravity();

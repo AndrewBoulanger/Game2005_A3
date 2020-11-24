@@ -36,11 +36,14 @@ private:
 
 	Ship* m_pShip;
 
-	BulletPool* m_pbulletPool;
 
 	bool m_sceneActive;
 
-	float spawnTime, timer;
+	BulletPool* m_pbulletPool;
+	float m_spawnTime, m_timer;
+
+	void SpawnBullet();
+	void DeactivateAllBullets();
 
 	// UI Items
 	Button* m_pBackButton;

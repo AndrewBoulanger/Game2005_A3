@@ -21,6 +21,7 @@ public:
 
 	Bullet* getNextInactiveBullet();
 	void deactivateBullet();
+	void deactivateAll();
 	bool hasAvailableBullets();
 
 	int getSize();

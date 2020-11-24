@@ -69,7 +69,7 @@ void Bullet::m_checkBounds()
 	if (getTransform()->position.y > 600)
 	{
 		m_active = false;
-		reset(rand() % (Config::SCREEN_WIDTH - getWidth()), -getHeight());
+		reset();
 	}
 }
 
@@ -78,10 +78,10 @@ void Bullet::m_reset()
 }
 
 
-void Bullet::reset(float x, float y)
+void Bullet::reset()
 {
-	getTransform()->position.x = x;
-	getTransform()->position.y = y;
+	getTransform()->position.x = rand() % (Config::SCREEN_WIDTH - getWidth());
+	getTransform()->position.y = -getHeight();
 
 	m_angle = 0;
 	m_active = false;

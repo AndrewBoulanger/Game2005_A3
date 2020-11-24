@@ -27,7 +27,9 @@ void BulletPool::resize(int newSize)
 Bullet* BulletPool::getNextInactiveBullet()
 {
 	if (hasAvailableBullets())
+	{
 		return m_pBullets.at(m_nextActive++);
+	}
 	else
 	{
 		cout << "No bullets available\n";
@@ -43,6 +45,17 @@ void BulletPool::deactivateBullet()
 		m_pBullets.pop_front();
 		m_nextActive--;
 	}
+}
+
+//resets bullets and # of active, remember to also remove them as children in the playscene before calling this
+void BulletPool::deactivateAll()  
+{				
+	
+	for (int i = 0; i < m_nextActive; i++)
+	{
+		m_pBullets.at(i)->reset();
+	}
+	m_nextActive = 0;
 }
 
 bool BulletPool::hasAvailableBullets()

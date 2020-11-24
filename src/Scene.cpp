@@ -31,9 +31,12 @@ void Scene::addChild(DisplayObject * child, uint32_t layer_index, std::optional<
 	m_displayList.push_back(child);
 }
 
-void Scene::removeChild(DisplayObject* child)
+void Scene::removeChild(DisplayObject* child, bool destroy)
 {
-	delete child;
+	if (destroy)
+	{
+		delete child;
+	}
 	m_displayList.erase(std::remove(m_displayList.begin(), m_displayList.end(), child), m_displayList.end());
 }
 

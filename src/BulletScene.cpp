@@ -9,6 +9,7 @@
 #include "Util.h"
 
 #define PPM 30
+#define DELTATIME 1/60
 
 BulletScene::BulletScene()
 {
@@ -37,6 +38,32 @@ void BulletScene::draw()
 
 void BulletScene::update()
 {
+	if (m_sceneActive)
+	{
+		m_timer -= 1.0* DELTATIME;
+		
+		if (m_timer <= 0)
+		{
+			m_timer = m_spawnTime;
+			SpawnBullet();
+		}
+
+		int numInctive = 0;
+
+		//check active bullets
+		for (int i = 0; i < m_pbulletPool->getNumberOfActive(); i++)
+		{
+			if (m_pbulletPool->getdeque()->at(i)->IsActive() == false)
+			{
+				numInctive++;  //deactivate bullet will push these off the active side of the deque
+				removeChild(m_pbulletPool->getdeque()->at(i), false);
+			}
+		}
+
+		for (int i = 0; i < numInctive; i++)
+			m_pbulletPool->deactivateBullet();
+
+	}
 
 	updateDisplayList();
 
@@ -130,12 +157,16 @@ void BulletScene::start()
 	m_PPM = PPM;
 
 	m_sceneActive = false;
+	m_spawnTime = 3.0f;
+	m_timer = 0;
 	// Back Button
 	m_pBackButton = new Button("../Assets/textures/restartButton.png", "Reset", RESTART_BUTTON);
 	m_pBackButton->getTransform()->position = glm::vec2(300.0f, 500.0f);
 	m_pBackButton->addEventListener(CLICK, [&]()-> void
 	{
 		m_pBackButton->setActive(false);
+		m_sceneActive = false;
+		DeactivateAllBullets();
 	});
 
 	m_pBackButton->addEventListener(MOUSE_OVER, [&]()->void
@@ -154,7 +185,13 @@ void BulletScene::start()
 	m_pNextButton->getTransform()->position = glm::vec2(500.0f, 500.0f);
 	m_pNextButton->addEventListener(CLICK, [&]()-> void
 	{
-		StartSim();
+		if (m_sceneActive)
+		{
+			m_sceneActive = false;
+			DeactivateAllBullets();
+		}
+		else
+			StartSim();
 	});
 
 	m_pNextButton->addEventListener(MOUSE_OVER, [&]()->void
@@ -224,6 +261,25 @@ bool BulletScene::StartSim()
 	m_sceneActive = true;
 
 	return false;
+}
+
+void BulletScene::SpawnBullet()
+{
+	if (m_pbulletPool->hasAvailableBullets())
+	{
+		Bullet* temp = m_pbulletPool->getNextInactiveBullet();
+		addChild(temp);
+		temp->setActive(true);
+	}
+}
+
+void BulletScene::DeactivateAllBullets()
+{
+	for (int i = 0; i < m_pbulletPool->getNumberOfActive(); i++)
+	{
+		removeChild(m_pbulletPool->getdeque()->at(i));
+	}
+	m_pbulletPool->deactivateAll();
 }
 
 
