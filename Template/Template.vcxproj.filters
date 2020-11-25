@@ -129,6 +129,10 @@
     <ClCompile Include="..\src\BulletPool.cpp">
       <Filter>Game Objects</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Polygon.cpp">
+      <Filter>Game Objects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Brick.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\StartScene.h">
@@ -269,6 +273,10 @@
     <ClInclude Include="..\src\BulletPool.h">
       <Filter>Game Objects</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Polygon.h">
+      <Filter>Game Objects</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Brick.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\README.md">

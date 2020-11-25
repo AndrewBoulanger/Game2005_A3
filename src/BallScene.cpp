@@ -123,13 +123,13 @@ void BallScene::start()
 	// Back Button
 	m_pBackButton = new Button("../Assets/textures/backButton.png", "back", BACK_BUTTON);
 	m_pBackButton->getTransform()->position = glm::vec2(65.0f, 550.0f);
+	m_pBackButton->setWidth(100);
+	m_pBackButton->setHeight(35);
 	m_pBackButton->addEventListener(CLICK, [&]()-> void
 	{
 		m_pBackButton->setActive(false);
 		TheGame::Instance()->changeSceneState(START_SCENE);
 	});
-
-
 	m_pBackButton->addEventListener(MOUSE_OVER, [&]()->void
 	{
 		m_pBackButton->setAlpha(128);
@@ -166,11 +166,14 @@ void BallScene::start()
 	m_pInstructionsLabel->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 550.0f);
 	addChild(m_pInstructionsLabel);
 
-	m_pTempLabel = new Label("X from Bot Ramp: ", "Consolas");
-	m_pTempLabel->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 20.0f);
-	addChild(m_pTempLabel);
+	m_ball = new Polygon();
+	addChild(m_ball);
+
 
 	m_maxVelocity = 0;
+
+
+
 }
 
 void BallScene::GUI_Function() const
@@ -189,6 +192,8 @@ void BallScene::GUI_Function() const
 	static float CoefficientFriction = 0.42f;
 	static float mass = 12.8f;
 
+	static int sides = 20;
+
 	if (ImGui::Button("Reset To Default"))
 	{
 		// Reset to Default values
@@ -197,9 +202,14 @@ void BallScene::GUI_Function() const
 		CoefficientFriction = 0.42f;
 		mass = 12.8f;
 
+		sides = 20;
 	}
 
 	ImGui::Separator();
+
+	if (ImGui::SliderInt("number of sides", &sides, 3, 20)) {
+		m_ball->createShape(sides);
+	}
 
 
 	if (ImGui::SliderFloat("Height (m)", &height, 0.01f, 15.0f)) {

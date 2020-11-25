@@ -35,8 +35,8 @@ private:
 
 	float m_PPM;
 
-	Ship* m_pShip;
 
+	Ship* m_pShip;
 
 	bool m_sceneActive;
 

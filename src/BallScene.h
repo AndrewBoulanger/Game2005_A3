@@ -2,11 +2,11 @@
 #ifndef __BALL_SCENE__
 #define __BALL_SCENE__
 
+
 #include "Scene.h"
-#include "Plane.h"
-#include "Player.h"
 #include "Button.h"
 #include "Label.h"
+#include "Polygon.h"
 
 class BallScene : public Scene
 {
@@ -34,6 +34,7 @@ private:
 
 	float m_PPM;
 
+	Polygon* m_ball;
 
 	// UI Items
 	Button* m_pBackButton;

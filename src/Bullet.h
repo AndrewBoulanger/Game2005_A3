@@ -31,8 +31,6 @@ public:
 	float getGravity();
 	bool IsActive();
 
-	void setPixelsPerMeter(float PPM);
-
 	void setFriction(float val);
 	void setGravity(float val);
 	void toggleActive();
@@ -50,7 +48,7 @@ private:
 
 	//movement variables
 	glm::vec2 m_direction;
-	float m_friction, m_gravity, m_PPM;
+	float m_friction, m_gravity;
 
 	bool m_active;
 	bool m_overlapping;

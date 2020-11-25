@@ -119,10 +119,6 @@ bool Bullet::IsActive()
 	return m_active;
 }
 
-void Bullet::setPixelsPerMeter(float PPM)
-{
-	m_PPM = PPM;
-}
 
 
 
@@ -133,7 +129,7 @@ void Bullet::setFriction(float val)
 
 void Bullet::setGravity(float val)
 {
-	m_gravity = val * m_PPM;
+	m_gravity = val;
 }
 
 void Bullet::toggleActive()
