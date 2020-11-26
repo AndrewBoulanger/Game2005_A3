@@ -1,14 +1,19 @@
 #include "Polygon.h"
 #include "Renderer.h"
+#include "Util.h"
+#include <iostream>
 
 Polygon::Polygon()
 {
-	setWidth(40);
-	setHeight(40);
+	m_diameter = 40.0f;
+	setWidth(m_diameter);
+	setHeight(m_diameter);
 	m_sides = 20;
 	m_active = false;
+	m_initialVelocity = glm::vec2(5.0f, -1.0f);
 	getTransform()->position = glm::vec2(150.0f, 350.0f);
-	getRigidBody()->velocity = glm::vec2(0, 0);
+	getRigidBody()->velocity = m_initialVelocity;
+	m_elasticity = 0.95;
 	getRigidBody()->isColliding = false;
 	createShape(m_sides);
 }
@@ -26,11 +31,16 @@ void Polygon::draw()
 		SDL_RenderDrawLineF(renderer, m_vertices[i].x, m_vertices[i].y, m_vertices[i + 1].x, m_vertices[i + 1].y);
 	}
 	SDL_RenderDrawLineF(renderer, m_vertices[m_sides - 1].x, m_vertices[m_sides - 1].y, m_vertices[0].x, m_vertices[0].y);
+
 }
 
 void Polygon::update()
 {
-
+	if (m_active)
+	{
+		UpdateVerticesPosition(getRigidBody()->velocity);
+		m_checkBounds();
+	}
 }
 
 void Polygon::clean()
@@ -44,20 +54,28 @@ void Polygon::createShape(int n)
 	// alias for x and y
 	const auto x = getTransform()->position.x;
 	const auto y = getTransform()->position.y;
-	const float r = getHeight() * 0.5f;
-
+	const float r = m_diameter * 0.5f;
+	int lowest = 0;
+	int highest = 0;
 	float theta = 0.0f;
 
 	for (int i = 0; i < n; i++)
 	{
 		m_vertices[i] = glm::vec2(x + r * cos(theta), y + r * sin(theta));
 		theta += 2 * PI / n;
+
+		lowest = (m_vertices[i].y < m_vertices[lowest].y) ? i : lowest;
+		highest = (m_vertices[i].y > m_vertices[highest].y) ? i : highest;
 	}
+	setWidth(m_vertices[0].x - m_vertices[m_sides /2].x);
+	setHeight(m_vertices[highest].y - m_vertices[lowest].y);
 }
 
 void Polygon::reset()
 {
 	getTransform()->position = glm::vec2(150.0f, 350.0f);
+	createShape(m_sides);
+	RigidBody().velocity = m_initialVelocity;
 	m_active = false;
 }
 
@@ -69,10 +87,130 @@ bool Polygon::IsActive()
 void Polygon::setActive(bool flag)
 {
 	m_active = flag;
+	getRigidBody()->velocity = m_initialVelocity;
 }
 
 void Polygon::m_checkCollision(GameObject* otherObject)
 {
+}
+
+void Polygon::m_checkBounds()
+{
+	const float nextX = getRigidBody()->velocity.x;
+	const float nextY = getRigidBody()->velocity.y;
+	const float angle = CalculateAngleOfMovement();
+	float yOffset = getHeight() * 0.5;
+	float newX = 0.0f;
+	float newY = 0.0f;
+
+	switch (verticesBoundsCheck())
+	{
+	case 0:  //right
+	{
+		newX = Config::SCREEN_WIDTH - m_vertices[0].x;      //x distance to wall
+		newY = tan(angle) * newX;									//account for y movement
+		UpdateVerticesPosition(glm::vec2(newX, newY));					//move all vertices 
+		getRigidBody()->velocity.x *= -1;								//reverse x direction
+		getRigidBody()->velocity *= m_elasticity;
+	
+		break;
+	}
+	case 1:  //left
+	{
+		newX = getWidth() - m_vertices[0].x;
+		newY = tan(angle) * newX;
+		UpdateVerticesPosition(glm::vec2(newX, newY));
+		getRigidBody()->velocity.x *= -1;								//reverse x direction
+		getRigidBody()->velocity *= m_elasticity;
+
+		break;
+	}
+	case 2:  //bottom
+	{
+		newY = Config::SCREEN_HEIGHT - yOffset - getTransform()->position.y;      //y distance to wall
+		newX = (tan(angle) == 0.0f) ? 0.0f : newY / tan(angle);		//account for x movement (dont divide by 0)
+		UpdateVerticesPosition(glm::vec2(newX, newY));					//move all vertices 
+		getRigidBody()->velocity.y *= -1;								//reverse x direction
+		getRigidBody()->velocity *= m_elasticity;
+		
+		break;
+	}
+	case 3: //top
+	{
+		newY = yOffset - getTransform()->position.y;
+		newX = (tan(angle) == 0.0f) ? 0.0f : newY / tan(angle);
+		UpdateVerticesPosition(glm::vec2(newX, newY));
+		getRigidBody()->velocity.y *= -1;								//reverse x direction
+		getRigidBody()->velocity *= m_elasticity;
+		
+		break;
+		}
+	default:
+		break;
+
+	}
+
+}
+
+
+void Polygon::setInitialVelocity(glm::vec2 newDir)
+{
+	m_initialVelocity = newDir;
+}
+
+glm::vec2 Polygon::GetMomentum()
+{
+	getRigidBody()->isColliding;
+	return getRigidBody()->mass * getRigidBody()->velocity;
+}
+
+void Polygon::setElasticity(float val)
+{
+	m_elasticity = val;
+}
+
+float Polygon::CalculateAngleOfMovement()
+{
+	const float X = getRigidBody()->velocity.x;
+	const float Y = getRigidBody()->velocity.y;
+	float angle = 0.0f;
+	if (X != 0)
+		angle = atan2(Y, X);
+	else
+	{
+		angle = (Y > 0) ? Util::Deg2Rad * -90.0f : Util::Deg2Rad * 90.0f;
+	}
+	return angle;
+}
+
+void Polygon::UpdateVerticesPosition(glm::vec2 newPos)
+{
+	getTransform()->position += newPos;
+	for (int i = 0; i < m_sides; i++)
+	{
+		m_vertices[i] += newPos;
+	}
+}
+
+int Polygon::verticesBoundsCheck()
+{
+	const float nextX = getRigidBody()->velocity.x;
+	const float nextY = getRigidBody()->velocity.y;
+	for (int i = 0; i < m_sides; i++)
+	{  //right of screen
+		if (m_vertices[i].x + nextX > Config::SCREEN_WIDTH)
+			return 0;
+		//left 
+		else if (m_vertices[i].x + nextX < 0)
+			return 1;
+		//bottom
+		else if (m_vertices[i].y + nextY > Config::SCREEN_HEIGHT)
+			return 2;
+		//top
+		else if (m_vertices[i].y + nextY < 0)
+			return 3;
+	}
+return -1;
 }
 
 

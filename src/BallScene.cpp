@@ -42,7 +42,7 @@ void BallScene::draw()
 
 void BallScene::update()
 {
-
+	updateDisplayList();
 }
 
 void BallScene::clean()
@@ -143,7 +143,7 @@ void BallScene::start()
 
 	// Next Button
 	m_pNextButton = new Button("../Assets/textures/startButton.png", "activate", START_BUTTON);
-	m_pNextButton->getTransform()->position = glm::vec2(500.0f, 500.0f);
+	m_pNextButton->getTransform()->position = glm::vec2(400.0f, 500.0f);
 	m_pNextButton->addEventListener(CLICK, [&]()-> void
 	{
 		StartSim();
@@ -162,7 +162,7 @@ void BallScene::start()
 	addChild(m_pNextButton);
 
 	/* Instructions Label */
-	m_pInstructionsLabel = new Label("Press the backtick (`) character to toggle Debug View", "Consolas", 20, { 255,255,255,255 });
+	m_pInstructionsLabel = new Label("Press the backtick (`) character to toggle Debug View", "Consolas", 16, { 255,255,255,255 });
 	m_pInstructionsLabel->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 550.0f);
 	addChild(m_pInstructionsLabel);
 
@@ -171,8 +171,6 @@ void BallScene::start()
 
 
 	m_maxVelocity = 0;
-
-
 
 }
 
@@ -187,22 +185,37 @@ void BallScene::GUI_Function() const
 
 	ImGui::Begin("Physics simulation", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 
-	static float height = 3.0f;
-	static float length = 4.0f;
-	static float CoefficientFriction = 0.42f;
 	static float mass = 12.8f;
-
+	static glm::vec2 initialVelocity = glm::vec2(5, -1);
 	static int sides = 20;
+	static float elasticity = 0.95f;
+
+	
+	if (ImGui::Button(m_ball->IsActive() ? "Stop" : "Start"))
+	{
+		if (m_ball->IsActive())
+		{
+			m_ball->reset();
+
+		}
+		else
+			m_ball->setActive(true);
+
+	}
 
 	if (ImGui::Button("Reset To Default"))
 	{
 		// Reset to Default values
-		height = 3.0f;
-		length = 4.0f;
-		CoefficientFriction = 0.42f;
+		
 		mass = 12.8f;
-
+		m_ball->getRigidBody()->mass = mass;
+		elasticity = 0.95f;
+		m_ball->setElasticity(elasticity);
 		sides = 20;
+		m_ball->createShape(sides);
+		initialVelocity = glm::vec2(5, -1);
+		m_ball->setInitialVelocity(initialVelocity);
+		m_ball->reset();
 	}
 
 	ImGui::Separator();
@@ -212,36 +225,22 @@ void BallScene::GUI_Function() const
 	}
 
 
-	if (ImGui::SliderFloat("Height (m)", &height, 0.01f, 15.0f)) {
-		(float)m_rise = height * m_PPM;
+	if (ImGui::SliderFloat("mass (kg)", &mass, 0.01f, 15.0f)) {
+		m_ball->getRigidBody()->mass = mass;
 	}
 
-	ImGui::SameLine(350.0F, -1);
-	ImGui::Text("Angle of depression:  %f degrees", -(glm::degrees(glm::atan(m_rise, m_run))));
-
-	if (ImGui::SliderFloat("Length (m)", &length, 0.01f, 20.0f)) {
-		(float)m_run = length * m_PPM;
+	if (ImGui::SliderFloat2("Length (m)", &initialVelocity.x,  -20.0f, 20.0f)) {
+		m_ball->reset();
+		m_ball->setInitialVelocity(initialVelocity);
 	}
 
-	ImGui::SameLine(350.0F, 1);
-
-
-	if (ImGui::SliderFloat("Co. of Friction", &CoefficientFriction, 0.0f, 3.0f)) {
+	if (ImGui::SliderFloat("elasticity", &elasticity, 0.0f, 1.0f)) {
+		m_ball->setElasticity(elasticity);
 	}
 
 
-	if (ImGui::SliderFloat("Mass (kg)", &mass, 0.1f, 200.0f)) {
-
-	}
-
-
-	ImGui::Checkbox("Show Net Force", &m_viewForce);
-
-
-	ImGui::Checkbox("Show Velocity", &m_viewVelocity);
-
-	ImGui::SameLine(350.0F, -1);
-	ImGui::Text("Max Speed:            %fm/s", m_maxVelocity);
+	
+	ImGui::Text("Speed:  %0.2fm/s", Util::magnitude(m_ball->getRigidBody()->velocity));
 
 
 	ImGui::End();

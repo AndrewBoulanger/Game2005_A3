@@ -31,19 +31,30 @@ public:
 	void m_move();
 	void m_checkBounds();
 
-	void setSides(int sides);
+	/*no setMass() - mass handled by rigidbody*/
+	void setInitialVelocity(glm::vec2 newDir);
+	glm::vec2 GetMomentum();
+	void setElasticity(float val);
 
+	
 private:
+	float m_diameter;
 	float m_angle;
 	int m_sides;
 	std::array<glm::vec2, MAXVERTICES> m_vertices;
 
 	//movement variables
-	glm::vec2 m_direction;
-	float m_mass;
+	glm::vec2 m_initialVelocity;
+	glm::vec2 m_momentum;
+	float m_elasticity;
 
 	bool m_active;
 	bool m_overlapping;
+
+	float CalculateAngleOfMovement();
+	void UpdateVerticesPosition(glm::vec2 newPos);
+	int verticesBoundsCheck();
+
 };
 
 
