@@ -13,14 +13,14 @@ Polygon::Polygon()
 	m_initialVelocity = glm::vec2(5.0f, -1.0f);
 	getTransform()->position = glm::vec2(150.0f, 350.0f);
 	getRigidBody()->velocity = m_initialVelocity;
+	getRigidBody()->mass = 2;
 	m_elasticity = 0.95;
 	getRigidBody()->isColliding = false;
 	createShape(m_sides);
 }
 
 Polygon::~Polygon()
-{
-}
+= default;
 
 void Polygon::draw()
 {
@@ -57,6 +57,7 @@ void Polygon::createShape(int n)
 	const float r = m_diameter * 0.5f;
 	int lowest = 0;
 	int highest = 0;
+	int leftest = 0;
 	float theta = 0.0f;
 
 	for (int i = 0; i < n; i++)
@@ -66,8 +67,9 @@ void Polygon::createShape(int n)
 
 		lowest = (m_vertices[i].y < m_vertices[lowest].y) ? i : lowest;
 		highest = (m_vertices[i].y > m_vertices[highest].y) ? i : highest;
+		leftest = (m_vertices[i].x < m_vertices[leftest].x) ? i : leftest;
 	}
-	setWidth(m_vertices[0].x - m_vertices[m_sides /2].x);
+	setWidth(m_vertices[0].x - m_vertices[leftest].x);
 	setHeight(m_vertices[highest].y - m_vertices[lowest].y);
 }
 
@@ -100,54 +102,41 @@ void Polygon::m_checkBounds()
 	const float nextY = getRigidBody()->velocity.y;
 	const float angle = CalculateAngleOfMovement();
 	float yOffset = getHeight() * 0.5;
-	float newX = 0.0f;
-	float newY = 0.0f;
+	
 
-	switch (verticesBoundsCheck())
+	if(m_vertices[0].x + nextX > Config::SCREEN_WIDTH)
 	{
-	case 0:  //right
-	{
-		newX = Config::SCREEN_WIDTH - m_vertices[0].x;      //x distance to wall
-		newY = tan(angle) * newX;									//account for y movement
+		float newX = Config::SCREEN_WIDTH - m_vertices[0].x;      //x distance to wall
+		float newY = tan(angle) * newX;									//account for y movement
 		UpdateVerticesPosition(glm::vec2(newX, newY));					//move all vertices 
 		getRigidBody()->velocity.x *= -1;								//reverse x direction
+		getRigidBody()->velocity *= m_elasticity;
+	}
+	else if (m_vertices[0].x - getWidth() + nextX <= 0)  //left
+	{
+		float newX = getWidth() - m_vertices[0].x;
+		float newY = tan(angle) * newX;
+		UpdateVerticesPosition(glm::vec2(newX, newY));
+		getRigidBody()->velocity.x *= -1;								//reverse x direction
+		getRigidBody()->velocity *= m_elasticity;
+	}
+	if (getTransform()->position.y + yOffset + nextY > Config::SCREEN_HEIGHT)  //bottom
+	{
+		float newY = Config::SCREEN_HEIGHT - yOffset - getTransform()->position.y;      //y distance to wall
+		float newX = (tan(angle) == 0.0f) ? 0.0f : newY / tan(angle);		//account for x movement (dont divide by 0)
+		UpdateVerticesPosition(glm::vec2(newX, newY));					//move all vertices 
+		getRigidBody()->velocity.y *= -1;								//reverse x direction
 		getRigidBody()->velocity *= m_elasticity;
 	
-		break;
 	}
-	case 1:  //left
+	else if (getTransform()->position.y - yOffset + nextY <0 )//top
 	{
-		newX = getWidth() - m_vertices[0].x;
-		newY = tan(angle) * newX;
-		UpdateVerticesPosition(glm::vec2(newX, newY));
-		getRigidBody()->velocity.x *= -1;								//reverse x direction
-		getRigidBody()->velocity *= m_elasticity;
-
-		break;
-	}
-	case 2:  //bottom
-	{
-		newY = Config::SCREEN_HEIGHT - yOffset - getTransform()->position.y;      //y distance to wall
-		newX = (tan(angle) == 0.0f) ? 0.0f : newY / tan(angle);		//account for x movement (dont divide by 0)
-		UpdateVerticesPosition(glm::vec2(newX, newY));					//move all vertices 
-		getRigidBody()->velocity.y *= -1;								//reverse x direction
-		getRigidBody()->velocity *= m_elasticity;
-		
-		break;
-	}
-	case 3: //top
-	{
-		newY = yOffset - getTransform()->position.y;
-		newX = (tan(angle) == 0.0f) ? 0.0f : newY / tan(angle);
+		float newY = yOffset - getTransform()->position.y;
+		float newX = (tan(angle) == 0.0f) ? 0.0f : newY / tan(angle);
 		UpdateVerticesPosition(glm::vec2(newX, newY));
 		getRigidBody()->velocity.y *= -1;								//reverse x direction
 		getRigidBody()->velocity *= m_elasticity;
 		
-		break;
-		}
-	default:
-		break;
-
 	}
 
 }
@@ -167,6 +156,11 @@ glm::vec2 Polygon::GetMomentum()
 void Polygon::setElasticity(float val)
 {
 	m_elasticity = val;
+}
+
+int Polygon::getSides()
+{
+	return m_sides;
 }
 
 float Polygon::CalculateAngleOfMovement()

@@ -7,6 +7,7 @@
 #include "Button.h"
 #include "Label.h"
 #include "Polygon.h"
+#include "Brick.h"
 
 class BallScene : public Scene
 {
@@ -26,15 +27,15 @@ private:
 	bool StartSim();
 	std::string m_guiTitle;
 
-	glm::vec2 m_mousePosition;
-
 	//slope variables
 	glm::vec2 m_trianglePos;
 	float m_run, m_rise;
 
 	float m_PPM;
 
-	Polygon* m_ball;
+	Polygon* m_pBall;
+	Brick* m_pBrick;
+
 
 	// UI Items
 	Button* m_pBackButton;
@@ -47,6 +48,7 @@ private:
 
 	// Misc Functions
 	void DrawArrow(glm::vec2 Start, glm::vec2 Dir, float Length, glm::vec4 colour);
+	int m_mouseWheel;
 };
 
 #endif /* defined (__BALL_SCENE__) */

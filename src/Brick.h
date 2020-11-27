@@ -1,9 +1,25 @@
 #pragma once
+#include "DisplayObject.h"
 
-#include "Polygon.h"
-class Brick
+class Brick final : public DisplayObject
 {
+public:
+	Brick();
+	~Brick();
 
-	Polygon* m_polygon;
+	// Inherited via GameObject
+	virtual void draw() override;
+	virtual void update() override;
+	virtual void clean() override;
+
+	void moveUp();
+	void moveDown();
+	void stopMoving();
+
+	void checkBounds();
+private:
+	float m_accelerationRate;
+	float m_directionY;
+
 };
 

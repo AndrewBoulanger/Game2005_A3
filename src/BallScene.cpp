@@ -42,6 +42,20 @@ void BallScene::draw()
 
 void BallScene::update()
 {
+	if (m_pBall->getSides() > 4)  //circle/rect check
+	{
+		CollisionManager::circleAABBCheck(m_pBall, m_pBrick);
+	
+	}
+	else if (m_pBall->getSides() == 4)
+	{
+		CollisionManager::AABBCheck(m_pBall, m_pBrick);  //two boxes
+	}
+	else
+	{
+		
+	}
+
 	updateDisplayList();
 }
 
@@ -54,43 +68,17 @@ void BallScene::handleEvents()
 {
 	EventManager::Instance().update();
 
-	// handle player movement with GameController
-	if (SDL_NumJoysticks() > 0)
+	if (EventManager::Instance().getMouseWheel() < 0)
 	{
-		if (EventManager::Instance().getGameController(0) != nullptr)
-		{
-			const auto deadZone = 10000;
-			if (EventManager::Instance().getGameController(0)->LEFT_STICK_X > deadZone)
-			{
-
-			}
-			else if (EventManager::Instance().getGameController(0)->LEFT_STICK_X < -deadZone)
-			{
-
-			}
-			else
-			{
-
-			}
-		}
+		m_pBrick->moveDown();
 	}
-
-
-	// handle player movement if no Game Controllers found
-	if (SDL_NumJoysticks() < 1)
+	else if (EventManager::Instance().getMouseWheel() > 0)
 	{
-		if (EventManager::Instance().isKeyDown(SDL_SCANCODE_A))
-		{
-
-		}
-		else if (EventManager::Instance().isKeyDown(SDL_SCANCODE_D))
-		{
-
-		}
-		else
-		{
-
-		}
+		m_pBrick->moveUp();
+	}
+	else
+	{
+		m_pBrick->stopMoving();
 	}
 
 
@@ -119,6 +107,7 @@ void BallScene::start()
 	// Pixels Per Meter
 	m_PPM = PPM;
 
+	m_mouseWheel = EventManager::Instance().getMouseWheel();
 
 	// Back Button
 	m_pBackButton = new Button("../Assets/textures/backButton.png", "back", BACK_BUTTON);
@@ -141,34 +130,16 @@ void BallScene::start()
 	});
 	addChild(m_pBackButton);
 
-	// Next Button
-	m_pNextButton = new Button("../Assets/textures/startButton.png", "activate", START_BUTTON);
-	m_pNextButton->getTransform()->position = glm::vec2(400.0f, 500.0f);
-	m_pNextButton->addEventListener(CLICK, [&]()-> void
-	{
-		StartSim();
-	});
-
-	m_pNextButton->addEventListener(MOUSE_OVER, [&]()->void
-	{
-		m_pNextButton->setAlpha(128);
-	});
-
-	m_pNextButton->addEventListener(MOUSE_OUT, [&]()->void
-	{
-		m_pNextButton->setAlpha(255);
-	});
-
-	addChild(m_pNextButton);
-
 	/* Instructions Label */
 	m_pInstructionsLabel = new Label("Press the backtick (`) character to toggle Debug View", "Consolas", 16, { 255,255,255,255 });
 	m_pInstructionsLabel->getTransform()->position = glm::vec2(Config::SCREEN_WIDTH * 0.5f, 550.0f);
 	addChild(m_pInstructionsLabel);
 
-	m_ball = new Polygon();
-	addChild(m_ball);
+	m_pBall = new Polygon();
+	addChild(m_pBall);
 
+	m_pBrick = new Brick();
+	addChild(m_pBrick);
 
 	m_maxVelocity = 0;
 
@@ -185,21 +156,21 @@ void BallScene::GUI_Function() const
 
 	ImGui::Begin("Physics simulation", NULL, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_MenuBar);
 
-	static float mass = 12.8f;
+	static float mass = 2.0f;
 	static glm::vec2 initialVelocity = glm::vec2(5, -1);
 	static int sides = 20;
 	static float elasticity = 0.95f;
 
 	
-	if (ImGui::Button(m_ball->IsActive() ? "Stop" : "Start"))
+	if (ImGui::Button(m_pBall->IsActive() ? "Stop" : "Start"))
 	{
-		if (m_ball->IsActive())
+		if (m_pBall->IsActive())
 		{
-			m_ball->reset();
+			m_pBall->reset();
 
 		}
 		else
-			m_ball->setActive(true);
+			m_pBall->setActive(true);
 
 	}
 
@@ -207,40 +178,41 @@ void BallScene::GUI_Function() const
 	{
 		// Reset to Default values
 		
-		mass = 12.8f;
-		m_ball->getRigidBody()->mass = mass;
+		mass = 2.0f;
+		m_pBall->getRigidBody()->mass = mass;
 		elasticity = 0.95f;
-		m_ball->setElasticity(elasticity);
+		m_pBall->setElasticity(elasticity);
 		sides = 20;
-		m_ball->createShape(sides);
+		m_pBall->createShape(sides);
 		initialVelocity = glm::vec2(5, -1);
-		m_ball->setInitialVelocity(initialVelocity);
-		m_ball->reset();
+		m_pBall->setInitialVelocity(initialVelocity);
+		m_pBall->reset();
 	}
 
 	ImGui::Separator();
 
 	if (ImGui::SliderInt("number of sides", &sides, 3, 20)) {
-		m_ball->createShape(sides);
+		m_pBall->createShape(sides);
 	}
 
 
-	if (ImGui::SliderFloat("mass (kg)", &mass, 0.01f, 15.0f)) {
-		m_ball->getRigidBody()->mass = mass;
+	if (ImGui::SliderFloat("mass of ball (kg)", &mass, 0.01f, 15.0f)) {
+		m_pBall->getRigidBody()->mass = mass;
 	}
 
-	if (ImGui::SliderFloat2("Length (m)", &initialVelocity.x,  -20.0f, 20.0f)) {
-		m_ball->reset();
-		m_ball->setInitialVelocity(initialVelocity);
+	if (ImGui::SliderFloat2("Initial velocity of ball (m/s)", &initialVelocity.x,  -20.0f, 20.0f)) {
+		m_pBall->reset();
+		m_pBall->setInitialVelocity(initialVelocity);
 	}
 
-	if (ImGui::SliderFloat("elasticity", &elasticity, 0.0f, 1.0f)) {
-		m_ball->setElasticity(elasticity);
+	if (ImGui::SliderFloat("energy reflected", &elasticity, 0.0f, 1.0f)) {
+		m_pBall->setElasticity(elasticity);
 	}
 
 
 	
-	ImGui::Text("Speed:  %0.2fm/s", Util::magnitude(m_ball->getRigidBody()->velocity));
+	ImGui::Text("Speed:  %0.2fm/s", Util::magnitude(m_pBall->getRigidBody()->velocity));
+	ImGui::Text("Momentum of the ball:  %0.2fkg m/s", Util::magnitude(m_pBall->getRigidBody()->velocity) * mass);
 
 
 	ImGui::End();

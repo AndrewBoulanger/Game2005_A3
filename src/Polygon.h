@@ -28,14 +28,13 @@ public:
 	
 	void m_checkCollision(GameObject* otherObject);
 
-	void m_move();
 	void m_checkBounds();
 
 	/*no setMass() - mass handled by rigidbody*/
 	void setInitialVelocity(glm::vec2 newDir);
 	glm::vec2 GetMomentum();
 	void setElasticity(float val);
-
+	int getSides();
 	
 private:
 	float m_diameter;

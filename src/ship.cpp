@@ -10,8 +10,8 @@ Ship::Ship()
 	TextureManager::Instance()->load("../Assets/textures/ship3.png", "ship");
 
 	auto size = TextureManager::Instance()->getTextureSize("ship");
-	setWidth(size.x);
-	setHeight(size.y);
+	setWidth(50);
+	setHeight(40);
 
 	getTransform()->position = glm::vec2(400.0f, 300.0f);
 	getRigidBody()->velocity = glm::vec2(0.0f, 0.0f);
@@ -54,25 +54,25 @@ void Ship::clean()
 void Ship::moveRight()
 {
 	m_direction.x = 1;
-	m_angle = 0;
+	m_angle = 90;
 }
 
 void Ship::moveLeft()
 {
 	m_direction.x = -1;
-	m_angle = 180;
+	m_angle = -90;
 }
 
 void Ship::moveUp()
 {
 	m_direction.y = -1;
-	m_angle = -90;
+	m_angle = 0;
 }
 
 void Ship::moveDown()
 {
 	m_direction.y = 1;
-	m_angle = 90;
+	m_angle = 180;
 }
 
 void Ship::stopMovingX()
@@ -115,6 +115,7 @@ void Ship::move()
 	glm::vec2 pos = getTransform()->position;
 	pos.x += getRigidBody()->velocity.x * deltaTime;
 	pos.y += getRigidBody()->velocity.y * deltaTime;
+
 
 	getTransform()->position = pos;
 }
