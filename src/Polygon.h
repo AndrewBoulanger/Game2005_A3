@@ -26,7 +26,9 @@ public:
 	bool IsActive();
 	void setActive(bool flag);
 	
-	void m_checkCollision(GameObject* otherObject);
+	bool m_checkCollision(GameObject* otherObject);
+	void collisionResponse(GameObject* otherObject);
+	void moveOutOf(glm::vec2 WallDir, float dist);
 
 	void m_checkBounds();
 

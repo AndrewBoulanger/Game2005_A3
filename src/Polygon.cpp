@@ -77,7 +77,7 @@ void Polygon::reset()
 {
 	getTransform()->position = glm::vec2(150.0f, 350.0f);
 	createShape(m_sides);
-	RigidBody().velocity = m_initialVelocity;
+	getRigidBody()->velocity = m_initialVelocity;
 	m_active = false;
 }
 
@@ -92,8 +92,141 @@ void Polygon::setActive(bool flag)
 	getRigidBody()->velocity = m_initialVelocity;
 }
 
-void Polygon::m_checkCollision(GameObject* otherObject)
+bool Polygon::m_checkCollision(GameObject* otherObject)
 {
+	// Checking Polygon Collision with a Rectangular object
+	glm::vec2 start;
+	glm::vec2 end;
+	glm::vec2 BallPos = getTransform()->position;
+
+	// Collision Info
+	int brickWidth = otherObject->getWidth();
+	int brickHeight = otherObject->getHeight();
+
+	glm::vec2 TopLeft = otherObject->getTransform()->position - glm::vec2(brickWidth * 0.5f, brickHeight * 0.5f);
+
+	for (int i = 0; i < m_sides; i++)
+	{
+		// if on last side
+		if (i + 1 == m_sides)
+		{
+			// vector for last vertice to first
+			start = BallPos + m_vertices[0];
+			end = BallPos + m_vertices[i];
+		}
+		else
+		{
+			// else we are creating lines for the shape
+			start = BallPos + m_vertices[i + 1];
+			end = BallPos + m_vertices[i];
+		}
+
+		// Check collision with the line
+		if (CollisionManager::lineRectCheck(start, end, TopLeft, brickWidth, brickHeight))
+		{
+			return true;
+		}
+	}
+
+	// Went through all sides without returning true
+	return false;
+}
+
+void Polygon::collisionResponse(GameObject* otherObject)
+{
+	// Collision Info
+	int brickWidth = otherObject->getWidth();
+	int brickHeight = otherObject->getHeight();
+
+	glm::vec2 TopLeft = otherObject->getTransform()->position - glm::vec2(brickWidth * 0.5f, brickHeight * 0.5f);
+	glm::vec2 BottomRight = otherObject->getTransform()->position + glm::vec2(brickWidth * 0.5f, brickHeight * 0.5f);
+
+	// Check Ball's Position relative to Object, change Ball Accordingly
+	glm::vec2 BallPos = getTransform()->position;
+	float BallRadius = m_diameter * 0.5f;
+
+	// Hitting Right Side
+	if (BallPos.x > BottomRight.x)
+	{
+		// Change Direction (This should use Momentum)
+		if (otherObject->getRigidBody()->velocity.x > 0.0f)									//	If the Brick is moving in this direction	
+			getRigidBody()->velocity.x = 2 * otherObject->getRigidBody()->velocity.x;		//	Since brick's mass >>> ball's mass, ball's velocity = 2 * brick's velocity
+		else																				//	Else the Brick is not moving
+		{																					//	
+			getRigidBody()->velocity.x *= -1;												//	Acts same as wall, reverses this direction
+		}																					//	
+
+		// Move out of Brick
+		float distIntoWall = (BottomRight.x - (getTransform()->position.x - BallRadius));
+		glm::vec2 WallVec = glm::vec2(-1.0f, 0.0f);
+
+		moveOutOf(WallVec, distIntoWall);
+	}
+
+	// Hitting Left Side
+	if (BallPos.x < TopLeft.x)
+	{
+		// Change Direction
+		if (otherObject->getRigidBody()->velocity.x < 0.0f)
+			getRigidBody()->velocity.x = 2 * otherObject->getRigidBody()->velocity.x;
+		else
+		{
+			getRigidBody()->velocity.x *= -1;
+		}
+
+		// Move out of Brick
+		float distIntoWall = ((getTransform()->position.x + BallRadius) - TopLeft.x);
+		glm::vec2 WallVec = glm::vec2(1.0f, 0.0f);
+
+		moveOutOf(WallVec, distIntoWall);
+	}
+
+	// Hitting Top Side
+	if (BallPos.y < TopLeft.y)
+	{
+		// Change Direction
+		if (otherObject->getRigidBody()->velocity.y < 0.0f)
+			getRigidBody()->velocity.y = 2 * otherObject->getRigidBody()->velocity.y;
+		else
+		{
+			getRigidBody()->velocity.y *= -1;
+		}
+
+		// Move out of Brick
+		float distIntoWall = ((getTransform()->position.y + BallRadius) - TopLeft.y);
+		glm::vec2 WallVec = glm::vec2(0.0f, 1.0f);
+
+		moveOutOf(WallVec, distIntoWall);
+	}
+
+	// Hitting Bottom Side
+	if (BallPos.y > BottomRight.y)
+	{
+		// Change Direction
+		if (otherObject->getRigidBody()->velocity.y > 0.0f)
+			getRigidBody()->velocity.y = 2 * otherObject->getRigidBody()->velocity.y;
+		else
+		{
+			getRigidBody()->velocity.y *= -1;
+		}
+
+		// Move out of Brick
+		float distIntoWall = (BottomRight.y - (getTransform()->position.y - BallRadius));
+		glm::vec2 WallVec = glm::vec2(0.0f, -1.0f);
+
+		moveOutOf(WallVec, distIntoWall);
+	}
+
+	// Energy Lost
+	getRigidBody()->velocity *= m_elasticity;
+}
+
+/* Wall Dir is the Wall's Normal Vector * -1, dist is the distance travelled into the wall. */
+void Polygon::moveOutOf(glm::vec2 WallDir, float dist)
+{
+	glm::vec2 MoveBackDir = Util::normalize(getRigidBody()->velocity);										//	Direction Ball moved into wall at
+	glm::vec2 BackVec = MoveBackDir * (dist * cos(Util::Deg2Rad * Util::angle(WallDir, MoveBackDir)));		//	Vector of Distance into the wall
+	getTransform()->position -= BackVec;																	//	Subtracting Distance into wall
 }
 
 void Polygon::m_checkBounds()

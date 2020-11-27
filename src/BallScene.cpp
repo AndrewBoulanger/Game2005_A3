@@ -42,18 +42,19 @@ void BallScene::draw()
 
 void BallScene::update()
 {
-	if (m_pBall->getSides() > 4)  //circle/rect check
+	if (m_pBall->getSides() > 6)  //circle/rect check
 	{
-		CollisionManager::circleAABBCheck(m_pBall, m_pBrick);
-	
-	}
-	else if (m_pBall->getSides() == 4)
-	{
-		CollisionManager::AABBCheck(m_pBall, m_pBrick);  //two boxes
+		if (CollisionManager::circleAABBCheck(m_pBall, m_pBrick))
+		{
+			m_pBall->collisionResponse(m_pBrick);
+		}
 	}
 	else
 	{
-		
+		if (m_pBall->m_checkCollision(m_pBrick))
+		{
+			m_pBall->collisionResponse(m_pBrick);
+		}
 	}
 
 	updateDisplayList();
