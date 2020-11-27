@@ -55,7 +55,8 @@ private:
 	float CalculateAngleOfMovement();
 	void UpdateVerticesPosition(glm::vec2 newPos);
 	int verticesBoundsCheck();
-
+	// Furthest point locations of Shape
+	float m_left, m_right, m_top, m_bottom;
 };
 
 

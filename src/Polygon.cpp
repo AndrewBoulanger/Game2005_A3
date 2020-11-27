@@ -70,8 +70,12 @@ void Polygon::createShape(int n)
 		highest = (m_vertices[i].y > m_vertices[highest].y) ? i : highest;
 		leftest = (m_vertices[i].x < m_vertices[leftest].x) ? i : leftest;
 	}
-	setWidth(m_vertices[0].x - m_vertices[leftest].x);
-	setHeight(m_vertices[highest].y - m_vertices[lowest].y);
+	// setWidth(m_vertices[0].x - m_vertices[leftest].x);
+	// setHeight(m_vertices[highest].y - m_vertices[lowest].y);
+	m_left = -m_vertices[leftest].x;
+	m_right = m_vertices[0].x;
+	m_top = m_vertices[highest].y;
+	m_bottom = -m_vertices[lowest].y;
 }
 
 void Polygon::reset()
@@ -159,7 +163,11 @@ void Polygon::collisionResponse(GameObject* otherObject)
 		}																					//	
 
 		// Move out of Brick
-		float distIntoWall = (BottomRight.x - (getTransform()->position.x - BallRadius));
+		float distIntoWall;
+		if(m_sides > 6)
+			distIntoWall = (BottomRight.x - (getTransform()->position.x - BallRadius));
+		else
+			distIntoWall = (BottomRight.x - (getTransform()->position.x - m_left));
 		glm::vec2 WallVec = glm::vec2(-1.0f, 0.0f);
 
 		moveOutOf(WallVec, distIntoWall);
@@ -178,7 +186,11 @@ void Polygon::collisionResponse(GameObject* otherObject)
 		}
 
 		// Move out of Brick
-		float distIntoWall = ((getTransform()->position.x + BallRadius) - TopLeft.x);
+		float distIntoWall;
+		if (m_sides > 6)
+			distIntoWall = ((getTransform()->position.x + BallRadius) - TopLeft.x);
+		else
+			distIntoWall = ((getTransform()->position.x + m_right) - TopLeft.x);
 		glm::vec2 WallVec = glm::vec2(1.0f, 0.0f);
 
 		moveOutOf(WallVec, distIntoWall);
@@ -197,7 +209,11 @@ void Polygon::collisionResponse(GameObject* otherObject)
 		}
 
 		// Move out of Brick
-		float distIntoWall = ((getTransform()->position.y + BallRadius) - TopLeft.y);
+		float distIntoWall;
+		if (m_sides > 6)
+			distIntoWall = ((getTransform()->position.y + BallRadius) - TopLeft.y);
+		else
+			distIntoWall = ((getTransform()->position.y + m_bottom) - TopLeft.y);
 		glm::vec2 WallVec = glm::vec2(0.0f, 1.0f);
 
 		moveOutOf(WallVec, distIntoWall);
@@ -216,7 +232,11 @@ void Polygon::collisionResponse(GameObject* otherObject)
 		}
 
 		// Move out of Brick
-		float distIntoWall = (BottomRight.y - (getTransform()->position.y - BallRadius));
+		float distIntoWall;
+		if (m_sides > 6)
+			distIntoWall = (BottomRight.y - (getTransform()->position.y - BallRadius));
+		else
+			distIntoWall = (BottomRight.y - (getTransform()->position.y - m_top));
 		glm::vec2 WallVec = glm::vec2(0.0f, -1.0f);
 
 		moveOutOf(WallVec, distIntoWall);
@@ -236,43 +256,58 @@ void Polygon::moveOutOf(glm::vec2 WallDir, float dist)
 
 void Polygon::m_checkBounds()
 {
-	float yOffset = getHeight() * 0.5;
-	float xOffset = getWidth() * 0.5f;
+	float leftOffset, rightOffset, topOffset, bottomOffset;
 
-	if(getTransform()->position.x + xOffset > Config::SCREEN_WIDTH)
+	if (m_sides > 6)
 	{
-		getRigidBody()->velocity.x *= -1;								//reverse x direction
-		getRigidBody()->velocity *= m_elasticity;
-
-		int distIntoWall = ((getTransform()->position.x + xOffset) - Config::SCREEN_WIDTH);		//	Get Distance traveled into wall
-		glm::vec2 WallVec = glm::vec2(1.0f, 0.0f);												//	Wall's Normal * -1
-		moveOutOf(WallVec, distIntoWall);														//	Moving the ball out of the wall
+		leftOffset = rightOffset = getWidth() * 0.5f;
+		topOffset = bottomOffset = getHeight() * 0.5;
 	}
-	else if (getTransform()->position.x - xOffset < 0)  //left
+	else
+	{
+		leftOffset = m_left;
+		rightOffset = m_right;
+		topOffset = m_top;
+		bottomOffset = m_bottom;
+	}
+
+	// float yOffset = getHeight() * 0.5;
+	// float xOffset = getWidth() * 0.5f;
+
+	if(getTransform()->position.x + rightOffset > Config::SCREEN_WIDTH)
 	{
 		getRigidBody()->velocity.x *= -1;								//reverse x direction
 		getRigidBody()->velocity *= m_elasticity;
 
-		int distIntoWall = -(getTransform()->position.x - xOffset);
+		float distIntoWall = ((getTransform()->position.x + rightOffset) - Config::SCREEN_WIDTH);		//	Get Distance traveled into wall
+		glm::vec2 WallVec = glm::vec2(1.0f, 0.0f);														//	Wall's Normal * -1
+		moveOutOf(WallVec, distIntoWall);																//	Moving the ball out of the wall
+	}
+	else if (getTransform()->position.x - leftOffset < 0)  //left
+	{
+		getRigidBody()->velocity.x *= -1;								//reverse x direction
+		getRigidBody()->velocity *= m_elasticity;
+
+		float distIntoWall = -(getTransform()->position.x - leftOffset);
 		glm::vec2 WallVec = glm::vec2(-1.0f, 0.0f);
 		moveOutOf(WallVec, distIntoWall);
 	}
-	if (getTransform()->position.y + yOffset > Config::SCREEN_HEIGHT)  //bottom
+	if (getTransform()->position.y + bottomOffset > Config::SCREEN_HEIGHT)  //bottom
 	{
 		getRigidBody()->velocity.y *= -1;								//reverse x direction
 		getRigidBody()->velocity *= m_elasticity;
 
-		int distIntoWall = ((getTransform()->position.y + yOffset) - Config::SCREEN_HEIGHT);
+		float distIntoWall = ((getTransform()->position.y + bottomOffset) - Config::SCREEN_HEIGHT);
 		glm::vec2 WallVec = glm::vec2(0.0f, 1.0f);
 		moveOutOf(WallVec, distIntoWall);
 	
 	}
-	else if (getTransform()->position.y - yOffset < 0 )//top
+	else if (getTransform()->position.y - topOffset < 0 )//top
 	{
 		getRigidBody()->velocity.y *= -1;								//reverse x direction
 		getRigidBody()->velocity *= m_elasticity;
 		
-		int distIntoWall = -(getTransform()->position.y - yOffset);
+		float distIntoWall = -(getTransform()->position.y - topOffset);
 		glm::vec2 WallVec = glm::vec2(0.0f, -1.0f);
 		moveOutOf(WallVec, distIntoWall);
 	}
