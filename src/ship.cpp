@@ -37,7 +37,7 @@ void Ship::draw()
 	const auto y = getTransform()->position.y;
 
 	// draw the ship
-	TextureManager::Instance()->draw("ship", x, y, getWidth(), getHeight(), m_angle, 255);
+	TextureManager::Instance()->draw("ship", x, y, getWidth(), getHeight(), (m_angle + 90.0f), 255);
 }
 
 
@@ -45,6 +45,15 @@ void Ship::update()
 {
 	move();
 	m_checkBounds();
+
+	// Calculate Rotation
+	glm::vec2 dir = glm::vec2(0.0f, 1.0f);
+	if (Util::magnitude(getRigidBody()->velocity) > m_accelerationRate * 0.52f)
+		dir = Util::normalize(getRigidBody()->velocity);
+
+	m_angle = acos(dir.x / Util::magnitude(dir)) * (180.0f / 3.14159f);
+	if (dir.y < 0.0f)
+		m_angle = 360.0f - m_angle;
 }
 
 void Ship::clean()
@@ -54,25 +63,25 @@ void Ship::clean()
 void Ship::moveRight()
 {
 	m_direction.x = 1;
-	m_angle = 90;
+	// m_angle = 90;
 }
 
 void Ship::moveLeft()
 {
 	m_direction.x = -1;
-	m_angle = -90;
+	// m_angle = -90;
 }
 
 void Ship::moveUp()
 {
 	m_direction.y = -1;
-	m_angle = 0;
+	// m_angle = 0;
 }
 
 void Ship::moveDown()
 {
 	m_direction.y = 1;
-	m_angle = 180;
+	// m_angle = 180;
 }
 
 void Ship::stopMovingX()
