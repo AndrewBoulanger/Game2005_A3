@@ -1,6 +1,7 @@
 #include "Polygon.h"
 #include "Renderer.h"
 #include "Util.h"
+#include "CollisionManager.h"
 #include <iostream>
 
 Polygon::Polygon()
@@ -24,13 +25,13 @@ Polygon::~Polygon()
 
 void Polygon::draw()
 {
-	SDL_Renderer* renderer = Renderer::Instance()->getRenderer();
-	SDL_SetRenderDrawColor(renderer, 255, 200, 0, 255);
+	glm::vec2 POS = getTransform()->position;
+
 	for (int i = 0; i < m_sides -1; i++)
 	{
-		SDL_RenderDrawLineF(renderer, m_vertices[i].x, m_vertices[i].y, m_vertices[i + 1].x, m_vertices[i + 1].y);
+		Util::DrawLine(POS + m_vertices[i], POS + m_vertices[i + 1], glm::vec4((1.0f), (0.78f), (0.0f), (1.0f)));
 	}
-	SDL_RenderDrawLineF(renderer, m_vertices[m_sides - 1].x, m_vertices[m_sides - 1].y, m_vertices[0].x, m_vertices[0].y);
+	Util::DrawLine(POS + m_vertices[m_sides - 1], POS + m_vertices[0], glm::vec4((1.0f), (0.78f), (0.0f), (1.0f)));
 
 }
 
@@ -38,7 +39,7 @@ void Polygon::update()
 {
 	if (m_active)
 	{
-		UpdateVerticesPosition(getRigidBody()->velocity);
+		getTransform()->position += getRigidBody()->velocity;
 		m_checkBounds();
 	}
 }
@@ -52,8 +53,8 @@ void Polygon::createShape(int n)
 	m_sides = (n < 3) ? 3 : n;  //needs to have at least 3 sides
 
 	// alias for x and y
-	const auto x = getTransform()->position.x;
-	const auto y = getTransform()->position.y;
+	const auto x = 0.0f;		// getTransform()->position.x;
+	const auto y = 0.0f;		// getTransform()->position.y;
 	const float r = m_diameter * 0.5f;
 	int lowest = 0;
 	int highest = 0;
@@ -231,47 +232,46 @@ void Polygon::moveOutOf(glm::vec2 WallDir, float dist)
 
 void Polygon::m_checkBounds()
 {
-	const float nextX = getRigidBody()->velocity.x;
-	const float nextY = getRigidBody()->velocity.y;
-	const float angle = CalculateAngleOfMovement();
 	float yOffset = getHeight() * 0.5;
-	
+	float xOffset = getWidth() * 0.5f;
 
-	if(m_vertices[0].x + nextX > Config::SCREEN_WIDTH)
+	if(getTransform()->position.x + xOffset > Config::SCREEN_WIDTH)
 	{
-		float newX = Config::SCREEN_WIDTH - m_vertices[0].x;      //x distance to wall
-		float newY = tan(angle) * newX;									//account for y movement
-		UpdateVerticesPosition(glm::vec2(newX, newY));					//move all vertices 
 		getRigidBody()->velocity.x *= -1;								//reverse x direction
 		getRigidBody()->velocity *= m_elasticity;
+
+		int distIntoWall = ((getTransform()->position.x + xOffset) - Config::SCREEN_WIDTH);		//	Get Distance traveled into wall
+		glm::vec2 WallVec = glm::vec2(1.0f, 0.0f);												//	Wall's Normal * -1
+		moveOutOf(WallVec, distIntoWall);														//	Moving the ball out of the wall
 	}
-	else if (m_vertices[0].x - getWidth() + nextX <= 0)  //left
+	else if (getTransform()->position.x - xOffset < 0)  //left
 	{
-		float newX = getWidth() - m_vertices[0].x;
-		float newY = tan(angle) * newX;
-		UpdateVerticesPosition(glm::vec2(newX, newY));
 		getRigidBody()->velocity.x *= -1;								//reverse x direction
 		getRigidBody()->velocity *= m_elasticity;
+
+		int distIntoWall = -(getTransform()->position.x - xOffset);
+		glm::vec2 WallVec = glm::vec2(-1.0f, 0.0f);
+		moveOutOf(WallVec, distIntoWall);
 	}
-	if (getTransform()->position.y + yOffset + nextY > Config::SCREEN_HEIGHT)  //bottom
+	if (getTransform()->position.y + yOffset > Config::SCREEN_HEIGHT)  //bottom
 	{
-		float newY = Config::SCREEN_HEIGHT - yOffset - getTransform()->position.y;      //y distance to wall
-		float newX = (tan(angle) == 0.0f) ? 0.0f : newY / tan(angle);		//account for x movement (dont divide by 0)
-		UpdateVerticesPosition(glm::vec2(newX, newY));					//move all vertices 
 		getRigidBody()->velocity.y *= -1;								//reverse x direction
 		getRigidBody()->velocity *= m_elasticity;
+
+		int distIntoWall = ((getTransform()->position.y + yOffset) - Config::SCREEN_HEIGHT);
+		glm::vec2 WallVec = glm::vec2(0.0f, 1.0f);
+		moveOutOf(WallVec, distIntoWall);
 	
 	}
-	else if (getTransform()->position.y - yOffset + nextY <0 )//top
+	else if (getTransform()->position.y - yOffset < 0 )//top
 	{
-		float newY = yOffset - getTransform()->position.y;
-		float newX = (tan(angle) == 0.0f) ? 0.0f : newY / tan(angle);
-		UpdateVerticesPosition(glm::vec2(newX, newY));
 		getRigidBody()->velocity.y *= -1;								//reverse x direction
 		getRigidBody()->velocity *= m_elasticity;
 		
+		int distIntoWall = -(getTransform()->position.y - yOffset);
+		glm::vec2 WallVec = glm::vec2(0.0f, -1.0f);
+		moveOutOf(WallVec, distIntoWall);
 	}
-
 }
 
 
