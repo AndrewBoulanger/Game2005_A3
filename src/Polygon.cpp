@@ -154,7 +154,8 @@ void Polygon::collisionResponse(GameObject* otherObject)
 			getRigidBody()->velocity.x = 2 * otherObject->getRigidBody()->velocity.x;		//	Since brick's mass >>> ball's mass, ball's velocity = 2 * brick's velocity
 		else																				//	Else the Brick is not moving
 		{																					//	
-			getRigidBody()->velocity.x *= -1;												//	Acts same as wall, reverses this direction
+			if(getRigidBody()->velocity.x < 0.0f)											//
+				getRigidBody()->velocity.x *= -1;											//	Acts same as wall, reverses this direction
 		}																					//	
 
 		// Move out of Brick
@@ -172,7 +173,8 @@ void Polygon::collisionResponse(GameObject* otherObject)
 			getRigidBody()->velocity.x = 2 * otherObject->getRigidBody()->velocity.x;
 		else
 		{
-			getRigidBody()->velocity.x *= -1;
+			if (getRigidBody()->velocity.x > 0.0f)
+				getRigidBody()->velocity.x *= -1;
 		}
 
 		// Move out of Brick
@@ -190,7 +192,8 @@ void Polygon::collisionResponse(GameObject* otherObject)
 			getRigidBody()->velocity.y = 2 * otherObject->getRigidBody()->velocity.y;
 		else
 		{
-			getRigidBody()->velocity.y *= -1;
+			if (getRigidBody()->velocity.y > 0.0f)
+				getRigidBody()->velocity.y *= -1;
 		}
 
 		// Move out of Brick
@@ -208,7 +211,8 @@ void Polygon::collisionResponse(GameObject* otherObject)
 			getRigidBody()->velocity.y = 2 * otherObject->getRigidBody()->velocity.y;
 		else
 		{
-			getRigidBody()->velocity.y *= -1;
+			if (getRigidBody()->velocity.y < 0.0f)
+				getRigidBody()->velocity.y *= -1;
 		}
 
 		// Move out of Brick
